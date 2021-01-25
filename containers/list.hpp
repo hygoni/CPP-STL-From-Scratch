@@ -12,9 +12,13 @@
 
 #ifndef LIST_HPP
 # define LIST_HPP
+# include <algorithm>
 # include <cstddef>
 # include <limits>
+# include <functional>
 # include <memory>
+# include "ReverseIterator.hpp"
+# include "util.hpp"
 
 namespace ft {
 
@@ -26,12 +30,18 @@ namespace ft {
         ListNode  *_next;
 
         template <typename _T>
-        friend class List;
+        friend class list;
         template <typename _T>
         friend class ListIterator;
+        template <typename Iter>
+        friend class ReverseIterator;
     public:
-      
+      ListNode() {
+        _prev = _next = NULL;
+      }
+
       ListNode(T data) {
+        ListNode();
         _data = data;
       }
 
@@ -43,7 +53,6 @@ namespace ft {
 
   };
 
-  /* Iterator class (bidirectional) */
   template<typename T>
   class ListIterator {
     public:
@@ -52,7 +61,10 @@ namespace ft {
     protected:
       Node *_node;
       template <typename _T>
-      friend class List;
+      friend class list;
+
+      template <typename Iter>
+      friend class ReverseIterator;
 
     public:
       typedef T value_type;
@@ -60,7 +72,8 @@ namespace ft {
       typedef T& reference;
       typedef T const& const_reference;
       typedef std::ptrdiff_t difference_type; 
-     
+      typedef ft::bidirectional_iterator_tag iterator_category;
+
       ListIterator() {
         _node = NULL;
       }
@@ -92,13 +105,13 @@ namespace ft {
       }
 
       /* prefix decrement */
-      virtual ListIterator operator--() {
+      virtual ListIterator& operator--() {
         _node = _node->_prev;
         return *this;
       }
 
       /* postfix decrement */
-      virtual ListIterator& operator--(int) {
+      virtual ListIterator operator--(int) {
         ListIterator current = *this;
         --(*this);
         return current;
@@ -115,53 +128,21 @@ namespace ft {
       Node* getNode() {
         return _node;
       }
+      bool operator!=(const ListIterator& x) {
+        return !(*this == x);
+      }
 
       template <typename _T>
-      friend bool operator==(const ListIterator<_T> x, const ListIterator<_T> y);
+      friend bool operator==(const ListIterator<_T>& x, const ListIterator<_T>& y);
   };
 
-  template <typename T>
-  class ReverseListIterator : ListIterator {
-    public:
-      /* prefix increment */
-      virtual ListIterator& operator--() {
-        _node = _node->_next;
-        return *this;
-      }
-
-      /* postfix increment */
-      virtual ListIterator operator--(int) {
-        ListIterator current = *this;
-        ++(*this);
-        return current;
-      }
-
-      /* prefix decrement */
-      virtual ListIterator operator++() {
-        _node = _node->_prev;
-        return *this;
-      }
-
-      /* postfix decrement */
-      virtual ListIterator& operator++(int) {
-        ListIterator current = *this;
-        --(*this);
-        return current;
-      }
-  }
-
   template <typename _T>
-  bool operator==(const ListIterator<_T> x, const ListIterator<_T> y) {
-    return (x._node == y._node);
-  }
-
-  template <typename _T>
-  bool operator!=(const ListIterator<_T> x, const ListIterator<_T> y) {
-    return !(x == y);
+  bool operator==(const ListIterator<_T>& x, const ListIterator<_T>& y) {
+    return x._node == y._node;
   }
 
   template<typename T>
-  class List {
+  class list {
     public:
         typedef ListNode<T> Node;
         typedef T value_type;
@@ -173,38 +154,51 @@ namespace ft {
         /* iterator, const_iterator, reverse_iterator, const_reverse_iterator */
         typedef ListIterator<value_type> iterator;
         typedef ListIterator<const value_type> const_iterator;
+        typedef ReverseIterator<ListIterator<value_type> > reverse_iterator;
+        typedef ReverseIterator<ListIterator<value_type> > const_reverse_iterator;
         typedef size_t size_type;
         typedef std::ptrdiff_t difference_type;
 
         
-        explicit List() {
+        explicit list() {
           _size = 0;
-          _head = _tail = NULL;
+          _head = _tail = new Node();
+          _head->_prev = NULL;
+          _head->_next = NULL;
         }
 
-        explicit List(size_type n, value_type const& val = value_type()) {
+        explicit list(size_type n, const value_type& val = value_type()) {
           _size = 0;
-          _head = _tail = NULL;
-          insert(begin(), n, val);
+          _head = _tail = new Node();
+          _head->_prev = NULL;
+          _head->_next = NULL;
+          while (n--) {
+            insert(begin(), val);
+          }
         }
 
-        template <class InputIterator>
-        List(InputIterator first, InputIterator last) {
+
+        template <class InputIterator, typename ft::enable_if<typename InputIterator::value_type>::type*>
+        list(InputIterator first, InputIterator last) {
           _size = 0;
-          _head = _tail = NULL;
+          _head = _tail = new Node();
+          _head->_prev = NULL;
+          _head->_next = NULL;
           while (first != last) {
             push_back(*first);
             first++;
           }
         }
 
-        List(List const& list) {
+        list(list const& other) {
           _size = 0;
-          _head = _tail = NULL;
-          *this = list;
+          _head = _tail = new Node();
+          _head->_prev = NULL;
+          _head->_next = NULL;
+          *this = other;
         }
 
-        virtual ~List() {
+        virtual ~list() {
           Node *current = _head;
           Node *to_free = NULL;
           while (current != NULL) {
@@ -214,10 +208,11 @@ namespace ft {
           }
         }
 
-        List& operator=(List const& list) {
-          const_iterator it = list.begin();
+        list& operator=(list const& other) {
+          clear();
+          const_iterator it = other.begin();
 
-          while (it != list.end()) {
+          while (it != other.end()) {
             push_back(*it);
             it++;
           }
@@ -228,11 +223,10 @@ namespace ft {
           return iterator(_head);
         }
 
-
         iterator end() {
           if (_tail == NULL)
             return iterator();
-          return iterator(_tail->_next);
+          return iterator(_tail);
         }
 
         const_iterator begin() const {
@@ -244,7 +238,15 @@ namespace ft {
           if (_tail == NULL)
             return const_iterator();
           typedef ListNode<const value_type> const_node;
-          return const_iterator(reinterpret_cast<const_node*>(_tail->_next));
+          return const_iterator(reinterpret_cast<const_node*>(_tail));
+        }
+
+        reverse_iterator rbegin() {
+          return ReverseIterator<ListIterator<value_type> >(end());
+        }
+
+        reverse_iterator rend() {
+          return ReverseIterator<ListIterator<value_type> >(begin());
         }
 
         reference front() {
@@ -256,18 +258,18 @@ namespace ft {
         }
 
         reference back() {
-          return _tail->_data;
+          return _tail->_prev->_data;
         }
 
         const_reference back() const {
-          return const_cast<const value_type&>(_tail->_data);
+          return const_cast<const value_type&>(_tail->_prev->_data);
         }
 
         bool empty() const {
           return (_size == 0);
         }
 
-        size_type size() {
+        size_type size() const {
           return _size;
         }
 
@@ -275,70 +277,33 @@ namespace ft {
           return std::numeric_limits<difference_type>::max();
         }
 
-        /* assign */
+        template <typename InputIterator>
+        void assign(InputIterator first, InputIterator last) {
+          clear();
+          insert(begin(), first, last);
+        }
+
+        void assign(size_type n, const value_type& val) {
+          clear();
+          insert(begin(), n, val);
+        }
 
         void push_front (const value_type& value) {
           Node *copy = new Node(value);
-          if (_head == NULL) {
-            _head = copy;
-            _tail = copy;
-            _head->_prev = _tail->_prev =  NULL;
-            _head->_next = _tail->_next = NULL;
-          } else {
-            _head->_prev = copy;
-            copy->_next = _head;
-            copy->_prev = NULL;
-            _head = copy;
-          }
-          _size++;
+          insert(begin(), copy);
         }
 
         void pop_front() {
-          if (_head == NULL)
-            return;
-
-          if (_head == _tail) {
-            delete _head;
-            _head = _tail = NULL;
-          } else {
-            Node *to_free = _head;
-            _head = _head->_next;
-            _head->_prev = NULL;
-            delete to_free;
-          }
-          _size--;
+          erase(begin());
         }
 
         void push_back(const value_type& value) {
           Node *copy = new Node(value);
-          if (_head == NULL) {
-            _head = copy;
-            _tail = copy;
-            _head->_prev = _tail->_prev =  NULL;
-            _head->_next = _tail->_next = NULL;
-          } else {
-            _tail->_next = copy;
-            copy->_prev = _tail;
-            copy->_next = NULL;
-            _tail = copy;
-          }
-          _size++;
+          insert(end(), copy);
         }
 
         void pop_back() {
-          if (_head == NULL)
-            return;
-
-          if (_head == _tail) {
-            delete _head;
-            _head = _tail = NULL;
-          } else {
-            Node *to_free = _tail;
-            _tail = _tail->_prev;
-            delete to_free;
-            _tail->_next = NULL;
-          }
-          _size--;
+          erase(--end());
         }
 
         iterator insert(iterator position, const value_type& val) {
@@ -356,7 +321,6 @@ namespace ft {
           while (first != last) {
             insert(position, *first);
             first++;
-            position++;
           }
         }
 
@@ -364,20 +328,19 @@ namespace ft {
           return erase(position, true);
         }
 
-        void erase(iterator first, iterator last) {
+        iterator erase(iterator first, iterator last) {
           iterator ret = last;
 
           while (first != last) {
-            ret = erase(first);
-            first++;
+            first = erase(first);
           }
           return ret;
         }
 
-        void swap(List& list) {
-          std::swap(_head, list._head);
-          std::swap(_tail, list._tail);
-          std::swap(_size, list._size);
+        void swap(list& other) {
+          std::swap(_head, other._head);
+          std::swap(_tail, other._tail);
+          std::swap(_size, other._size);
         }
 
         void resize(size_type n, value_type val = value_type()) {
@@ -386,7 +349,7 @@ namespace ft {
           }
 
           while (_size < n) {
-            push_back(new Node(val));
+            push_back(val);
           }
         }
 
@@ -398,37 +361,36 @@ namespace ft {
             _head = _head->_next;
             delete to_free;
           }
-          _head = _tail = NULL;
+          _head = _tail = new Node();
+          _head->_prev = _head->_next = NULL;
           _size = 0;
         }
 
         /* Operations */
 
-        void splice(iterator position, List& list) {
-          iterator it = list.begin();
+        void splice(const_iterator position, list& other) {
+          iterator it = other.begin();
+          Node *node;
 
-          while (it != list.end()) {
-            splice(position, it);
-            it++;
-            position++;
+          while (it != other.end()) {
+            node = it._node;
+            it = erase(it, false);
+            insert(position, node);
           }
         }
 
-        void splice(iterator position, List& list, iterator i) {
-          Node *node = *i;
+        void splice(iterator position, list& other, iterator i) {
+          Node *node = i._node;
 
-          list.erase(node, false);
+          other.erase(node, false);
           insert(position, node);
         }
 
-        void splice(iterator position, List& list, iterator first, iterator last) {
+        void splice(iterator position, list& other, iterator first, iterator last) {
           while (first != last) {
-           Node *node = *first;
-
-           list.erase(node, false);
+           Node *node = first._node;
+           first = other.erase(node, false);
            insert(position, node);
-           position++;
-           first++;
           }
         }
 
@@ -436,7 +398,7 @@ namespace ft {
           iterator it = begin();
           
           while (it != end()) {
-            if (it->_data == val) {
+            if (*it == val) {
               it = erase(it);
             } else {
               it++;
@@ -470,6 +432,7 @@ namespace ft {
               it = erase(it);
             } else {
               it++;
+              prev++;
             }
           }
         }
@@ -492,54 +455,29 @@ namespace ft {
           }
         }
 
-        void merge(List& list) {
-          iterator x = begin();
-          iterator y = list.begin();
-
-          while (y != list.end()) {
-            Node *node = *y;
-            
-            while (x != end() && *x > *y) {
-              x++;
-            }
-
-            list.erase(y, false);
-            if (x == end()) {
-              push_back(node);
-            } else {
-              insert((x + 1), node);
-            }
-            y++;
-          }
+        void merge(list& lst) {
+          merge(lst, std::less<value_type>());
         }
 
         template <class Compare>
-        void merge(List& list, Compare comp) {
+        void merge(list& lst, Compare comp) {
           iterator x = begin();
-          iterator y = list.begin();
+          iterator y = lst.begin();
 
-          while (y != list.end()) {
-            Node *node = *y;
+          while (y != lst.end()) {
+            Node *node = y._node;
             
             while (x != end() && comp(*x, *y)) {
               x++;
             }
 
-            list.erase(y, false);
-            if (x == end()) {
-              push_back(node);
-            } else {
-              iterator x_plus_one = x;
-              x_plus_one++;
-              /* TODO */
-              insert(x_plus_one, node);
-            }
-            y++;
+            y = lst.erase(y, false);
+            insert(x, node);
           }
         }
 
         void sort() {
-          merge_sort(*this);
+          merge_sort(*this, std::less<value_type>());
         }
 
         template <class Compare>
@@ -548,7 +486,13 @@ namespace ft {
         }
 
         void reverse() {
-        
+          list reversed;
+          iterator it = begin();
+          while (it != end()) {
+            reversed.push_front(*it);
+            it = erase(it);
+          }
+          swap(reversed);
         }
 
     
@@ -560,20 +504,13 @@ namespace ft {
         iterator insert(iterator position, Node *copy) {
           Node *node = position.getNode();
 
-          /* position == end() */
-          if (node == NULL) {
-            copy->_prev = copy->_next = NULL;
-            _head = _tail = copy;
-          } else {
-            if (node->_prev) {
-              node->_prev->_next = copy;
-            } else {
-              _head = copy;
-            }
-            copy->_prev = node->_prev;
-            copy->_next = node;
-            node->_prev = copy;
-          }
+          copy->_prev = node->_prev;
+          copy->_next = node;
+          if (node->_prev)
+            node->_prev->_next = copy;
+          else
+            _head = copy;
+          node->_prev = copy;
           _size++;
           return iterator(copy);
         }
@@ -584,38 +521,79 @@ namespace ft {
 
           if (node->_prev) {
             node->_prev->_next = node->_next;
-            if (delete_node)
-              delete node;
-            return iterator(ret);
           } else {
-            if (delete_node)
-              delete node;
-            _head = _tail = NULL;
-            _size--;
-            return iterator();
+            _head = node->_next;
           }
+          if (node->_next)
+            node->_next->_prev = node->_prev;
+          _size--;
+          if (delete_node)
+            delete node;
+
+          return iterator(ret);
         }
 
         template <typename Compare>
-        void merge_sort(List &list, Compare comp) {
-          List left, right;
-          size_t mid = list.size() / 2;
+        void merge_sort(list& lst, Compare comp) {
+          list left, right;
+          size_t mid = lst.size() / 2;
+          iterator lst_mid = lst.begin();
+          while (mid--)
+            lst_mid++;
           
-          if (list.size() == 1) {
+          if (lst.size() <= 1) {
             return ;
           }
-          left.splice(left.begin(), list.begin(), list.begin() + mid);
-          right.splice(right.begin(), list.begin() + mid, list.end());
-          merge_sort(left);
-          merge_sort(right);
-          list.merge(left, comp);
-          list.merge(right, comp);
+
+          /* split list recursively  */
+          left.splice(left.end(), lst, lst.begin(), lst_mid);
+          right.splice(right.end(), lst, lst_mid, lst.end());
+          /* sort left and right */
+          merge_sort(left, comp);
+          merge_sort(right, comp);
+          /* merge splitted list into one */
+          left.merge(right);
+          lst.swap(left);
         }
   };
 
   template <typename T>
-  void swap(List<T> &x, List<T>& y) {
+  void swap(list<T>& x, list<T>& y) {
     x.swap(y);
+  }
+
+  template <typename T>
+  bool operator==(const list<T>& lhs, const list<T>& rhs) {
+    if (lhs.size() == rhs.size()) {
+      return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    } else {
+      return false;
+    }
+  }
+
+  template <typename T>
+  bool operator<(list<T> lhs, list<T> rhs) {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+  }
+
+  template <typename T>
+  bool operator>(list<T> lhs, list<T> rhs) {
+    return !(lhs == rhs) && !(lhs < rhs);
+  }
+
+  template <typename T>
+  bool operator<=(list<T> lhs, list<T> rhs) {
+    return !(lhs > rhs);
+  }
+  
+  template <typename T>
+  bool operator>=(list<T> lhs, list<T> rhs) {
+    return !(lhs < rhs);
+  }
+
+  template <typename T>
+  bool operator!=(list<T> lhs, list<T> rhs) {
+    return !(lhs == rhs);
   }
 
 }  // namespace ft
