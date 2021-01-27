@@ -7,6 +7,7 @@ int   main(void) {
   test_list();
   test_stack();
   test_queue();
+  test_vector();
 
   return 0;
 }
