@@ -17,7 +17,6 @@
 # include <limits>
 # include <functional>
 # include <memory>
-# include "ReverseIterator.hpp"
 # include "util.hpp"
 
 namespace ft {
@@ -34,7 +33,7 @@ namespace ft {
         template <typename _T>
         friend class ListIterator;
         template <typename Iter>
-        friend class ReverseIterator;
+        friend class ReverseListIterator;
     public:
       ListNode() {
         _prev = _next = NULL;
@@ -63,8 +62,8 @@ namespace ft {
       template <typename _T>
       friend class list;
 
-      template <typename Iter>
-      friend class ReverseIterator;
+      template <typename _T>
+      friend class ReverseListIterator;
 
     public:
       typedef T value_type;
@@ -140,6 +139,92 @@ namespace ft {
   bool operator==(const ListIterator<_T>& x, const ListIterator<_T>& y) {
     return x._node == y._node;
   }
+  
+  template<typename T>
+  class ReverseListIterator {
+    public:
+      typedef ListNode<T> Node;
+    
+    protected:
+      Node *_node;
+      template <typename _T>
+      friend class list;
+
+    public:
+      typedef T value_type;
+      typedef T* pointer;
+      typedef T& reference;
+      typedef T const& const_reference;
+      typedef std::ptrdiff_t difference_type; 
+      typedef ft::bidirectional_iterator_tag iterator_category;
+
+      ReverseListIterator() {
+        _node = NULL;
+      }
+
+      ReverseListIterator(ListIterator<T> const& it) {
+        _node = it._node;
+      }
+
+      ReverseListIterator(Node *node) {
+        _node = node;
+      }
+
+      ReverseListIterator& operator=(ReverseListIterator const& it) {
+       _node = it._node;
+        return *this;
+      }
+
+      /* prefix increment */
+      ReverseListIterator& operator++() {
+        _node = _node->_prev;
+        return *this;
+      }
+
+      /* postfix increment */
+      ReverseListIterator operator++(int) {
+        ReverseListIterator current = *this;
+        ++(*this);
+        return current;
+      }
+
+      /* prefix decrement */
+      ReverseListIterator& operator--() {
+        _node = _node->_next;
+        return *this;
+      }
+
+      /* postfix decrement */
+      ReverseListIterator operator--(int) {
+        ReverseListIterator current = *this;
+        --(*this);
+        return current;
+      }
+
+      reference operator*() {
+        return _node->_data;
+      }
+
+      pointer operator->() const {
+        return &(_node->_data);
+      }
+
+      Node* getNode() {
+        return _node;
+      }
+      bool operator!=(const ReverseListIterator& x) {
+        return !(*this == x);
+      }
+
+      template <typename _T>
+      friend bool operator==(const ReverseListIterator<_T>& x, const ReverseListIterator<_T>& y);
+  };
+
+  template <typename _T>
+  bool operator==(const ReverseListIterator<_T>& x, const ReverseListIterator<_T>& y) {
+    return x._node == y._node;
+  }
+
 
   template<typename T>
   class list {
@@ -154,8 +239,8 @@ namespace ft {
         /* iterator, const_iterator, reverse_iterator, const_reverse_iterator */
         typedef ListIterator<value_type> iterator;
         typedef ListIterator<const value_type> const_iterator;
-        typedef ReverseIterator<ListIterator<value_type> > reverse_iterator;
-        typedef ReverseIterator<ListIterator<value_type> > const_reverse_iterator;
+        typedef ReverseListIterator<value_type> reverse_iterator;
+        typedef ReverseListIterator<const value_type> const_reverse_iterator;
         typedef size_t size_type;
         typedef std::ptrdiff_t difference_type;
 
@@ -242,11 +327,19 @@ namespace ft {
         }
 
         reverse_iterator rbegin() {
-          return ReverseIterator<ListIterator<value_type> >(end());
+          return reverse_iterator(--end());
+        }
+
+        const_reverse_iterator rbegin() const {
+          return const_reverse_iterator(--end());
         }
 
         reverse_iterator rend() {
-          return ReverseIterator<ListIterator<value_type> >(begin());
+          return const_reverse_iterator(_head->_prev);
+        }
+
+        const_reverse_iterator rend() const {
+          return reverse_iterator(_head->_prev);
         }
 
         reference front() {
@@ -317,7 +410,9 @@ namespace ft {
           }
         }
 
-        void insert(iterator position, iterator first, iterator last) {
+        template <class InputIterator>
+        void insert(iterator position, InputIterator first, InputIterator last,
+        typename ft::enable_if<typename InputIterator::value_type>::type* = 0) {
           while (first != last) {
             insert(position, *first);
             first++;

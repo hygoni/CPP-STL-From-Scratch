@@ -196,6 +196,21 @@ namespace list_test {
   }
 
 }
+
+void test_reverse_iterator() {
+  ft::list<int> lst;
+
+  for (int i = 1; i <= 5; i++) {
+    lst.push_back(i);
+  }
+
+  ft::list<int>::reverse_iterator it = lst.rbegin();
+  for (int i = 5; i <= 1; i--) {
+    assert(*it == i);
+    it++;
+  }
+}
+
 void test_list() {
   list_test::test_constructor();
   list_test::test_front_back();
