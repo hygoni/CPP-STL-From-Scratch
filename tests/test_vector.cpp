@@ -84,15 +84,20 @@ namespace vector_test {
     assert(one.empty());
   }
 
-  void test_reserve() {
+  void test_reserve_iterator() {
     ft::vector<int> v;
-
     for (int i = 0 ; i < 100000; i++) {
       v.push_back(i);
     }
 
+    ft::vector<int>::iterator it = v.begin();
+    ft::vector<int>::reverse_iterator rit = v.rbegin();
+
     for (int i = 0 ; i < 100000; i++) {
-      assert(v[i] == i);
+      assert(v[i] == i && *it == i);
+      assert(v[100000 - i - 1] == *rit);
+      it++;
+      rit++;
     }
 
   }
@@ -104,5 +109,5 @@ void test_vector() {
   vector_test::test_front_back();
   vector_test::test_push_pop_front_back();
   vector_test::test_insert_erase();
-  vector_test::test_reserve();
+  vector_test::test_reserve_iterator();
 }

@@ -18,6 +18,8 @@ namespace ft {
 
       template <typename _T>
       friend class vector;
+      template <typename _T>
+      friend class ReverseVectorIterator;
 
     public:
       typedef T value_type;
