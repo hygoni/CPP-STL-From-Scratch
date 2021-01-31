@@ -6,6 +6,7 @@
 # include <functional>
 # include <utility>
 # include <cmath>
+# include "util.hpp"
 
 namespace ft {
 
@@ -18,15 +19,26 @@ namespace ft {
     typedef std::pair<const Key, T> value_type;
     typedef Compare key_compare;
     
-    protected: 
+    protected:
+      tree_node     *_parent;
       tree_node     *_left;
       tree_node     *_right;
       int            _height;
       value_type     _value;
 
+      template <typename node, typename pointer, typename reference>
+      friend class map_iterator;
+      template <typename node, typename pointer, typename reference>
+      friend class reverse_map_iterator;
+
     public:
       tree_node(const value_type& value) : _value(value) {
-        _left = _right = NULL;
+        _left = _right = _parent = NULL;
+        _height = 1;
+      }
+
+      tree_node() {
+        _left = _right = _parent = NULL;
         _height = 1;
       }
 
@@ -36,6 +48,7 @@ namespace ft {
         if (_right != NULL)
           delete _right;
       }
+
       const key_type& get_key() const {
         return _value.first;
       }
@@ -47,13 +60,16 @@ namespace ft {
       int get_height() const {
         return _height;
       }
-   
+
       static node *left_rotate(node *a) {
         node *b = a->_right;
         node *t = b->_left;
    
         b->_left = a;
+        a->_parent = b;
         a->_right = t;
+        if (t)
+          t->_parent = a;
         update_height(a);
         update_height(b);
         return b;
@@ -64,7 +80,10 @@ namespace ft {
         node *t = a->_right;
 
         b->_left = t;
+        if (t)
+          t->_parent = b;
         a->_right = b;
+        b->_parent = a;
         update_height(a);
         update_height(b);
         return a;
@@ -113,20 +132,25 @@ namespace ft {
         return x;
       }
 
-      static node *insert(node *x, const value_type& value, const key_compare& cmp) {
+      static node *insert(node *x, const value_type& value, const key_compare& cmp, bool *is_successful) {
         key_type key = value.first;
-        mapped_type val = value.second;
 
-        if (x == NULL)
+        if (x == NULL) {
+          if (is_successful)
+            *is_successful = true;
           return new node(value);
+        }
         if (cmp(key, x->get_key())) {
-          x->_left = insert(x->_left, value, cmp);
+          x->_left = insert(x->_left, value, cmp, is_successful);
+          x->_left->_parent = x;
         } else if (!cmp(key, x->get_key()) && !cmp(x->get_key(), key)) {
           /* x, y are considered equal when !cmp(x, y) && !cmp(y, x) */
-          x->get_value() = val;
+          if (is_successful)
+            *is_successful = false;
           return x;
         } else {
-          x->_right = insert(x->_right, value, cmp);
+          x->_right = insert(x->_right, value, cmp, is_successful);
+          x->_right->_parent = x;
         }
         update_height(x);
         return rebalance(x, cmp);
@@ -144,11 +168,129 @@ namespace ft {
         }
       }
 
+      static node *min_node(node *x) {
+        while (x != NULL && x->_left != NULL)
+          x = x->_left;
+        return x;
+      }
+
+      static node *max_node(node *x) {
+        while (x != NULL && x->_right != NULL)
+          x = x->_right;
+        return x;
+      }
+
+      /* leftmost child of right subtree, or parents */
+      static node *next_node(const node *x) {
+        if (x->_right) {
+          return min_node(x->_right);
+        } else {
+          node *parent = x->_parent;
+          while (parent != NULL && parent->_right == x) {
+            x = parent;
+            parent = parent->_parent;
+          }
+          return parent;
+        }
+      }
+
+      /* rightmost child of left subtree, or parents */
+      static node *prev_node(const node *x) {
+        if (x->_left) {
+          return max_node(x->_left);
+        } else {
+          node *parent = x->_parent;
+          while (parent != NULL && parent->_left == x) {
+            x = parent;
+            parent = parent->_parent;
+          }
+          return parent;
+        }
+      }
+
   };
+
+  template<typename node, typename pointer, typename reference>
+  class map_iterator {
+    protected:
+      node *_node;
+      template <typename _Key, typename _T, typename _Compare>
+      friend class map;
+
+      template <typename _node_pointer, typename _pointer, typename _reference>
+      friend class reverse_map_iterator;
+
+    public:
+      typedef ft::bidirectional_iterator_tag iterator_category;
+
+      map_iterator() {
+        _node = NULL;
+      }
+
+      map_iterator(map_iterator const& it) {
+        _node = it._node;
+      }
+
+      map_iterator(node *x) {
+        _node = x;
+      }
+
+      map_iterator& operator=(map_iterator const& it) {
+        _node = it._node;
+        return *this;
+      }
+
+      virtual map_iterator& operator++() {
+        _node = node::next_node(_node);
+        return *this;
+      }
+
+      virtual map_iterator operator++(int) {
+        map_iterator current = *this;
+        ++(*this);
+        return current;
+      }
+      
+      virtual map_iterator& operator--() {
+        _node = node::prev_node(_node);
+        return *this;
+      }
+
+      virtual map_iterator operator--(int) {
+        map_iterator current = *this;
+        --(*this);
+        return current;
+      }
+
+      reference operator*() {
+        return _node->_value;
+      }
+
+      pointer operator->() const {
+        return &(_node->_value);
+      }
+
+      bool operator!=(const map_iterator& x) {
+        return !(*this == x);
+      }
+
+      template <typename _node, typename _pointer, typename _reference>
+      friend bool operator==(const map_iterator<_node, _pointer, _reference>& x,
+      const map_iterator<_node, _pointer, _reference>& y);
+  };
+
+  template <typename _node, typename _pointer, typename _reference>
+  bool operator==(const map_iterator<_node, _pointer, _reference>& x,
+  const map_iterator<_node, _pointer, _reference>& y) {
+    return x._node == y._node;
+  }
 
   /* implemented using AVL-Tree */
   template <class Key, class T, class Compare = std::less<Key> >
   class map {
+    protected:
+      typedef tree_node<Key, T, Compare> node;
+   
     public:
       typedef Key key_type;
       typedef T mapped_type;
@@ -160,10 +302,8 @@ namespace ft {
       typedef const value_type& const_reference;
       typedef value_type* pointer;
       typedef const value_type* const_pointer;
-      
-      /*
-      iterators
-      */
+      typedef map_iterator<node, pointer, reference> iterator;
+      typedef map_iterator<node, const_pointer, const_reference> const_iterator;
 
       map() {
         _size = 0;
@@ -186,6 +326,50 @@ namespace ft {
           delete _root;
       }
 
+      mapped_type& operator[](key_type key) {
+       _root = node::insert(_root, std::make_pair<const key_type, mapped_type>(key, mapped_type()), _cmp, NULL); 
+       return node::find(_root, key, _cmp)->get_value();
+      }
+     
+     iterator begin() {
+        node *leftmost = node::min_node(_root);
+        return iterator(leftmost);
+      }
+
+      const_iterator begin() const {
+        node *leftmost = const_cast<node*>(node::min_node(_root));
+        return const_iterator(leftmost);
+      }
+
+      iterator end() {
+        return iterator(&_end_node);
+      }
+
+      const_iterator end() const {
+        node *end_node = const_cast<node*>(&_end_node);
+        return const_iterator(end_node);
+      }
+
+      std::pair<iterator, bool> insert(const value_type& value) {
+        bool is_successful;
+        /* logical error */
+        node *inserted = node::insert(_root, value, _cmp, &is_successful);
+        return std::make_pair<iterator, bool>(iterator(inserted), is_successful);
+      }
+      
+
+      iterator insert(iterator hint, const value_type& value) {
+        (void)hint;
+        return insert(value);
+      }
+
+      template <typename InputIterator>
+      void insert(InputIterator first, InputIterator last) {
+        while (first != last) {
+          insert(*first);
+        }
+      }
+
       bool empty() const {
         return (_size == 0);
       }
@@ -205,121 +389,14 @@ namespace ft {
         _size = 0;
       }
 
-      int height() const {
-        return _root->get_height();
-      }
-      mapped_type& operator[](key_type key) {
-        if (node::find(_root, key, _cmp) == NULL)
-          _root = node::insert(_root, std::make_pair<const key_type, mapped_type>(key, mapped_type()), _cmp);  
-       return node::find(_root, key, _cmp)->get_value();
-      }
-
-      /*std::pair<iterator, bool>*/ void insert(const value_type& value) {
-        node::insert(_root, value, _cmp);
-      }
-      
-
-      /*
-      iterator insert(iterator hint, const value_type& value) {
-
-      }
-
-      template <typename InputIterator>
-      void insert(InputIterator first, InputIterator last) {
-        while (first != last) {
-
-        }
-      }
-      */
-
     protected:
-      typedef tree_node<Key, T, Compare> node;
       key_compare _cmp;
       node         *_root;
+      node         _end_node;
       size_type    _size;
   };
+  
 }
 
-/*  
-  template<typename T>
-  class map_iterator {
-    public:
-    
-    protected:
-      template <typename _T>
-      friend class map;
-
-      template <typename _T>
-      friend class reverse_map_iterator;
-
-    public:
-      typedef Key key_type;
-      typedef T mapped_type;
-      typedef std::pair<const Key, T> value_type;
-      typedef size_t size_type;
-      typedef std::ptrdiff_t difference_type;
-      typedef Compare key_compare;
-      typedef value_type& reference;
-      typedef const value_type& const_reference;
-      typedef value_type* pointer;
-      typedef const value_type* const_pointer;
-      typedef ft::bidirectional_iterator_tag iterator_category;
-
-      map_iterator() {
-
-      }
-
-      map_iterator(map_iterator const& it) {
-
-      }
-
-      map_iterator(Node *node) {
-
-      }
-
-      map_iterator& operator=(map_iterator const& it) {
-        return *this;
-      }
-
-      virtual map_iterator& operator++() {
-        return *this;
-      }
-
-      virtual map_iterator operator++(int) {
-        return current;
-      }
-      
-      virtual map_iterator& operator--() {
-        return *this;
-      }
-
-      virtual map_iterator operator--(int) {
-        return current;
-      }
-
-      reference operator*() {
-      }
-
-      pointer operator->() const {
-      
-      }
-
-      Node* getNode() {
-
-      }
-
-      bool operator!=(const map_iterator& x) {
-        return (x.)
-      }
-
-      template <typename _T>
-      friend bool operator==(const map_iterator<_T>& x, const map_iterator<_T>& y);
-  };
-
-  template <typename _T>
-  bool operator==(const map_iterator<_T>& x, const map_iterator<_T>& y) {
-    return x._node == y._node;
-  }
-*/
 
 #endif  // MAP_HPP_
