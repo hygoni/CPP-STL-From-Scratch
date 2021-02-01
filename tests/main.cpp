@@ -8,6 +8,6 @@ int   main(void) {
   test_stack();
   test_queue();
   test_vector();
-
+  test_map();
   return 0;
 }
