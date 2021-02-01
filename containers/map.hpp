@@ -16,7 +16,7 @@ namespace ft {
     typedef tree_node<Key, T, Compare> node;
     typedef Key key_type;
     typedef T mapped_type;
-    typedef std::pair<const Key, T> value_type;
+    typedef std::pair<Key, T> value_type;
     typedef Compare key_compare;
     
     protected:
@@ -26,6 +26,8 @@ namespace ft {
       int            _height;
       value_type     _value;
 
+      template <typename _Key, typename _T, typename _Compare>
+      friend class map;
       template <typename node, typename pointer, typename reference>
       friend class map_iterator;
       template <typename node, typename pointer, typename reference>
@@ -64,7 +66,8 @@ namespace ft {
       static node *left_rotate(node *a) {
         node *b = a->_right;
         node *t = b->_left;
-   
+
+        b->_parent = a->_parent;
         b->_left = a;
         a->_parent = b;
         a->_right = t;
@@ -79,6 +82,7 @@ namespace ft {
         node *a = b->_left;
         node *t = a->_right;
 
+        a->_parent = b->_parent;
         b->_left = t;
         if (t)
           t->_parent = b;
@@ -107,7 +111,7 @@ namespace ft {
           return get_height(x->_left) - get_height(x->_right);
       }
 
-      static node *rebalance(node *x, const key_compare& cmp) {
+      static node *rebalance(node *x) {
         int balance = get_balance(x);
         int left_balance = get_balance(x->_left);
         int right_balance = get_balance(x->_right);
@@ -153,7 +157,7 @@ namespace ft {
           x->_right->_parent = x;
         }
         update_height(x);
-        return rebalance(x, cmp);
+        return rebalance(x);
       }
 
       static node *find(node *x, const key_type& key, const key_compare& cmp) {
@@ -166,6 +170,40 @@ namespace ft {
         } else {
           return find(x->_right, key, cmp);
         }
+      }
+
+      static node* erase(node *x, const key_type& key) {
+        if (x == NULL)
+          return x;
+        if (_cmp(key, x->get_key())) {
+          x->_left = erase(x->_left, key);
+        } else if (!_cmp(key, x->get_key()) && !_cmp(x->get_key(), key)) {
+          /* found node */
+
+          if (x->_left == NULL || x->_right == NULL) {
+            node *child = x->_left ? x->_left : x->_right;
+            /* has no child */
+            if (child == NULL) {
+              child = x;
+              x = NULL;
+            } else {
+              /* has one child */
+              x->_value = child->_value; 
+            }
+            delete child;
+          } else {
+            /* has two child */
+            node *next = min_node(x->_right); /* inorder successor */
+            x->_value = next->_value;
+            x->_right = erase(x->_right, next->get_key());
+          }
+        } else {
+          x->_right = erase(x->_right, key);
+        }
+        if (x == NULL)
+          return x;
+        update_height(x);
+        return rebalance(x);
       }
 
       static node *min_node(node *x) {
@@ -214,6 +252,7 @@ namespace ft {
   class map_iterator {
     protected:
       node *_node;
+      node *_end_node;
       template <typename _Key, typename _T, typename _Compare>
       friend class map;
 
@@ -229,19 +268,24 @@ namespace ft {
 
       map_iterator(map_iterator const& it) {
         _node = it._node;
+        _end_node = it._end_node;
       }
 
-      map_iterator(node *x) {
+      map_iterator(node *x, node *end_node) {
         _node = x;
+        _end_node = end_node;
       }
 
       map_iterator& operator=(map_iterator const& it) {
         _node = it._node;
+        _end_node = it._end_node;
         return *this;
       }
 
       virtual map_iterator& operator++() {
         _node = node::next_node(_node);
+        if (_node == NULL)
+          _node = _end_node;
         return *this;
       }
 
@@ -253,6 +297,8 @@ namespace ft {
       
       virtual map_iterator& operator--() {
         _node = node::prev_node(_node);
+        if (_node == NULL)
+          _node = _end_node;
         return *this;
       }
 
@@ -289,7 +335,7 @@ namespace ft {
   template <class Key, class T, class Compare = std::less<Key> >
   class map {
     protected:
-      typedef tree_node<Key, T, Compare> node;
+      typedef tree_node<const Key, T, Compare> node;
    
     public:
       typedef Key key_type;
@@ -308,66 +354,52 @@ namespace ft {
       map() {
         _size = 0;
         _root = NULL;
+        _end_node = new node();
       }
 
       template <typename InputIterator>
       map (InputIterator first, InputIterator last, const Compare& comp = Compare()) {
         _size = 0;
         _root = NULL;
+        _end_node = new node();
+        insert(first, last);
       }
 
       map (const map& other) {
         _size = 0;
         _root = NULL;
+        _end_node = new node();
+        insert(other.begin(), other.end());
       }
 
       ~map() {
         if (_root != NULL)
           delete _root;
+        if (_end_node != NULL)
+          delete _end_node;
       }
 
       mapped_type& operator[](key_type key) {
-       _root = node::insert(_root, std::make_pair<const key_type, mapped_type>(key, mapped_type()), _cmp, NULL); 
+       insert(std::make_pair<const key_type, mapped_type>(key, mapped_type()));
        return node::find(_root, key, _cmp)->get_value();
       }
      
      iterator begin() {
         node *leftmost = node::min_node(_root);
-        return iterator(leftmost);
+        return iterator(leftmost, _end_node);
       }
 
       const_iterator begin() const {
         node *leftmost = const_cast<node*>(node::min_node(_root));
-        return const_iterator(leftmost);
+        return const_iterator(leftmost, _end_node);
       }
 
       iterator end() {
-        return iterator(&_end_node);
+        return iterator(_end_node, _end_node);
       }
 
       const_iterator end() const {
-        node *end_node = const_cast<node*>(&_end_node);
-        return const_iterator(end_node);
-      }
-
-      std::pair<iterator, bool> insert(const value_type& value) {
-        bool is_successful;
-        /* logical error */
-        node *inserted = node::insert(_root, value, _cmp, &is_successful);
-        return std::make_pair<iterator, bool>(iterator(inserted), is_successful);
-      }
-      
-
-      iterator insert(iterator hint, const value_type& value) {
-        (void)hint;
-        return insert(value);
-      }
-
-      template <typename InputIterator>
-      void insert(InputIterator first, InputIterator last) {
-        while (first != last) {
-          insert(*first);
-        }
+        return const_iterator(_end_node, _end_node);
       }
 
       bool empty() const {
@@ -381,7 +413,7 @@ namespace ft {
       size_type max_size() const {
         return std::numeric_limits<difference_type>::max();
       }
-
+      
       void clear() {
         if (_root != NULL)
           delete _root;
@@ -389,10 +421,74 @@ namespace ft {
         _size = 0;
       }
 
+      std::pair<iterator, bool> insert(const value_type& value) {
+        bool is_successful;
+        /* logical error */
+        node *inserted = node::insert(_root, value, _cmp, &is_successful);
+        if (is_successful) {
+          _root = inserted;
+          _root->_parent = NULL;
+          _size++;
+        }
+        return std::make_pair<iterator, bool>(iterator(inserted, _end_node), is_successful);
+      }
+      
+
+      iterator insert(iterator hint, const value_type& value) {
+        (void)hint;
+        return insert(value);
+      }
+
+      template <typename InputIterator>
+      void insert(InputIterator first, InputIterator last) {
+        while (first != last) {
+          insert(*first);
+          first++;
+        }
+      }
+
+      void erase(iterator pos) {
+        _root = node::erase(_root, pos->get_key());
+      }
+
+      void erase(iterator first, iterator last) {
+        while (first != last) {
+          first = erase(first);
+        }
+      }
+
+      void swap(map& other) {
+        std::swap(_size, other._size);
+        std::swap(_root, other._root);
+      }
+
+      size_type count(const key_type& key) {
+        if (find(key) != end())
+          return 1;
+        else
+          return 0;
+      }
+
+      iterator find(const key_type& key) {
+        node *x = node::find(_root, key, _cmp);
+        if (x == NULL)
+          return end();
+        else
+          return iterator(x, _end_node);
+      }
+
+      const_iterator find(const key_type& key) const {
+        node *x = node::find(_root, key, _cmp);
+        if (x == NULL)
+          return end();
+        else
+          return const_iterator(x, _end_node);
+      }
+
     protected:
       key_compare _cmp;
       node         *_root;
-      node         _end_node;
+      node         *_end_node;
       size_type    _size;
   };
   
