@@ -57,6 +57,15 @@ namespace map_test {
       it++;
     }
     assert((--map.end())->first == 1000);
+
+    it = --map.end();
+    ft::map<int, int>::reverse_iterator rit = map.rbegin();
+    while (rit != map.rend()) {
+      assert(rit->first == it->first);
+      assert(rit->second == it->second);
+      it--;
+      rit++;
+    }
   }
 
   void test_equal_lower_upper() {

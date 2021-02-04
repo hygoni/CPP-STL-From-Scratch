@@ -346,6 +346,95 @@ namespace ft {
     return x._node == y._node;
   }
 
+  template<typename node, typename _pointer, typename _reference>
+  class reverse_map_iterator {
+    protected:
+      node *_node;
+      node *_end_node;
+      template <typename _Key, typename _T, typename _Compare>
+      friend class map;
+
+    public:
+      typedef ft::bidirectional_iterator_tag iterator_category;
+      typedef typename node::value_type value_type;
+      typedef typename node::key_type key_type;
+      typedef typename node::mapped_type mapped_type;
+      typedef typename node::key_compare key_compare;
+      typedef typename node::difference_type difference_type;
+      typedef typename node::reference reference;
+      typedef typename node::const_reference const_reference;
+      typedef typename node::pointer pointer;
+      typedef typename node::const_pointer const_pointer;
+
+      reverse_map_iterator() {
+        _node = NULL;
+      }
+
+      reverse_map_iterator(map_iterator<node, _pointer, _reference> const& it) {
+        _node = it._node;
+        _end_node = it._end_node;
+      }
+
+      reverse_map_iterator(node *x, node *end_node) {
+        _node = x;
+        _end_node = end_node;
+      }
+
+      reverse_map_iterator& operator=(reverse_map_iterator const& it) {
+        _node = it._node;
+        _end_node = it._end_node;
+        return *this;
+      }
+
+      virtual reverse_map_iterator& operator++() {
+        _node = node::prev_node(_node);
+        if (_node == NULL)
+          _node = _end_node;
+        return *this;
+      }
+
+      virtual reverse_map_iterator operator++(int) {
+        reverse_map_iterator current = *this;
+        ++(*this);
+        return current;
+      }
+      
+      virtual reverse_map_iterator& operator--() {
+        _node = node::next_node(_node);
+        if (_node == NULL)
+          _node = _end_node;
+        return *this;
+      }
+
+      virtual reverse_map_iterator operator--(int) {
+        reverse_map_iterator current = *this;
+        --(*this);
+        return current;
+      }
+
+      _reference operator*() {
+        return _node->_value;
+      }
+
+      _pointer operator->() const {
+        return &(_node->_value);
+      }
+
+      bool operator!=(const reverse_map_iterator& x) {
+        return !(*this == x);
+      }
+
+      template <typename _node, typename __pointer, typename __reference>
+      friend bool operator==(const reverse_map_iterator<_node, __pointer, __reference>& x,
+      const reverse_map_iterator<_node, __pointer, __reference>& y);
+  };
+
+  template <typename _node, typename __pointer, typename __reference>
+  bool operator==(const reverse_map_iterator<_node, __pointer, __reference>& x,
+  const reverse_map_iterator<_node, __pointer, __reference>& y) {
+    return x._node == y._node;
+  }
+
   /* implemented using AVL-Tree */
   template <class Key, class T, class Compare = std::less<Key> >
   class map {
@@ -365,6 +454,8 @@ namespace ft {
       typedef const value_type* const_pointer;
       typedef map_iterator<node, pointer, reference> iterator;
       typedef map_iterator<node, const_pointer, const_reference> const_iterator;
+      typedef reverse_map_iterator<node, pointer, reference> reverse_iterator;
+      typedef reverse_map_iterator<node, const_pointer, const_reference> const_reverse_iterator;
 
       class value_compare {
         protected:
@@ -388,6 +479,13 @@ namespace ft {
         _size = 0;
         _root = NULL;
         _end_node = new node();
+      }
+
+      explicit map(const Compare& comp) {
+        _size = 0;
+        _root = NULL;
+        _end_node = new node();
+        _cmp = comp;
       }
 
       template <typename InputIterator>
@@ -431,12 +529,28 @@ namespace ft {
         return const_iterator(leftmost, _end_node);
       }
 
+      reverse_iterator rbegin() {
+        return reverse_iterator(--end());
+      }
+
+      const_reverse_iterator rbegin() const {
+        return const_reverse_iterator(--end());
+      }
+
       iterator end() {
         return iterator(_end_node, _end_node);
       }
 
       const_iterator end() const {
         return const_iterator(_end_node, _end_node);
+      }
+
+      reverse_iterator rend() {
+        return reverse_iterator(end());
+      }
+
+      const_reverse_iterator rend() const {
+        return const_reverse_iterator(end());
       }
 
       bool empty() const {
@@ -466,8 +580,8 @@ namespace ft {
           _root = inserted;
           _root->_parent = NULL;
           _size++;
-          /* inorder predecessor of end node is max node */
           _end_node->_left = node::max_node(_root);
+          _end_node->_right = node::min_node(_root);
         }
         return std::make_pair<iterator, bool>(iterator(inserted, _end_node), is_successful);
       }
