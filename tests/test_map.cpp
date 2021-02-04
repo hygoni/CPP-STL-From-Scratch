@@ -56,6 +56,7 @@ namespace map_test {
       n++;
       it++;
     }
+    assert((--map.end())->first == 1000);
   }
 
 } // namespace map_test

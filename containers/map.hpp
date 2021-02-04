@@ -390,8 +390,11 @@ namespace ft {
       ~map() {
         if (_root != NULL)
           delete _root;
-        if (_end_node != NULL)
+        if (_end_node != NULL) {
+          /* prevent double free */
+          _end_node->_left = _end_node->_right = NULL;
           delete _end_node;
+        }
       }
 
       mapped_type& operator[](key_type key) {
@@ -444,6 +447,8 @@ namespace ft {
           _root = inserted;
           _root->_parent = NULL;
           _size++;
+          /* inorder predecessor of end node is max node */
+          _end_node->_left = node::max_node(_root);
         }
         return std::make_pair<iterator, bool>(iterator(inserted, _end_node), is_successful);
       }
