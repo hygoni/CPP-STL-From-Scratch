@@ -59,10 +59,26 @@ namespace map_test {
     assert((--map.end())->first == 1000);
   }
 
+  void test_equal_lower_upper() {
+    ft::map<int, int> map;
+    ft::map<int, int>::iterator it;
+
+    for (int i = 1; i <= 100; i++) {
+      map[i] = i;
+    }
+    assert(map.lower_bound(10)->first == 10);
+    assert(map.upper_bound(10)->first == 11);
+    assert(map.lower_bound(1000) == map.end());
+    assert(map.upper_bound(1000) == map.end());
+    assert(map.equal_range(10).first == map.lower_bound(10));
+    assert(map.equal_range(10).second == map.upper_bound(10));
+  }
+
 } // namespace map_test
 
 void test_map() {
   map_test::test_constructor();
   map_test::test_iterator();
   map_test::test_insert_erase();
+  map_test::test_equal_lower_upper();
 }

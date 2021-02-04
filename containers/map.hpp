@@ -504,6 +504,66 @@ namespace ft {
         else
           return const_iterator(x, _end_node);
       }
+
+      std::pair<iterator, iterator> equal_range(const key_type& key) {
+        iterator first, last;
+
+        first = lower_bound(key);
+        last = upper_bound(key);
+        return std::make_pair(first, last);
+      }
+
+      std::pair<const_iterator, const_iterator> equal_range(const key_type& key) const {
+        const_iterator first, last;
+        
+        first = lower_bound(key);
+        last = upper_bound(key);
+        return std::make_pair(first, last);
+      }
+
+      iterator lower_bound(const key_type& key) {
+        iterator it = begin();
+        while (it != end()) {
+          if (!_cmp(it->first, key)) {
+            break;
+          }
+          it++;
+        }
+        return it;
+      }
+      
+      const_iterator lower_bound(const key_type& key) const {
+        const_iterator it = begin();
+        while (it != end()) {
+          if (!_cmp(it->first, key)) {
+            break;
+          }
+          it++;
+        }
+        return it;
+      }
+
+      iterator upper_bound(const key_type& key) {
+        iterator it = begin();
+        while (it != end()) {
+          if (_cmp(key, it->first)) {
+            break;
+          }
+          it++;
+        }
+        return it;
+      }
+
+      const_iterator upper_bound(const key_type& key) const {
+        const_iterator it = begin();
+        while (it != end()) {
+          if (_cmp(key, it->first)) {
+            break;
+          }
+          it++;
+        }
+        return it;
+      }
     
     protected:
       key_compare _cmp;
