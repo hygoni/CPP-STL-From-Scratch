@@ -633,6 +633,11 @@ namespace ft {
     return !(lhs < rhs);
   }
 
+  template <typename _Key, typename _T, typename _Compare>
+  void swap(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+    lhs.swap(rhs);
+  }
+
 }
 
 
