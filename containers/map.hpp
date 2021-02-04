@@ -16,8 +16,14 @@ namespace ft {
     typedef tree_node<Key, T, Compare> node;
     typedef Key key_type;
     typedef T mapped_type;
-    typedef std::pair<Key, T> value_type;
+    typedef std::pair<const Key, T> value_type;
     typedef Compare key_compare;
+    typedef size_t size_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
     
     protected:
       tree_node     *_parent;
@@ -248,7 +254,7 @@ namespace ft {
 
   };
 
-  template<typename node, typename pointer, typename reference>
+  template<typename node, typename _pointer, typename _reference>
   class map_iterator {
     protected:
       node *_node;
@@ -256,11 +262,20 @@ namespace ft {
       template <typename _Key, typename _T, typename _Compare>
       friend class map;
 
-      template <typename _node_pointer, typename _pointer, typename _reference>
+      template <typename _node_pointer, typename __pointer, typename __reference>
       friend class reverse_map_iterator;
 
     public:
       typedef ft::bidirectional_iterator_tag iterator_category;
+      typedef typename node::value_type value_type;
+      typedef typename node::key_type key_type;
+      typedef typename node::mapped_type mapped_type;
+      typedef typename node::key_compare key_compare;
+      typedef typename node::difference_type difference_type;
+      typedef typename node::reference reference;
+      typedef typename node::const_reference const_reference;
+      typedef typename node::pointer pointer;
+      typedef typename node::const_pointer const_pointer;
 
       map_iterator() {
         _node = NULL;
@@ -308,11 +323,11 @@ namespace ft {
         return current;
       }
 
-      reference operator*() {
+      _reference operator*() {
         return _node->_value;
       }
 
-      pointer operator->() const {
+      _pointer operator->() const {
         return &(_node->_value);
       }
 
@@ -320,14 +335,14 @@ namespace ft {
         return !(*this == x);
       }
 
-      template <typename _node, typename _pointer, typename _reference>
-      friend bool operator==(const map_iterator<_node, _pointer, _reference>& x,
-      const map_iterator<_node, _pointer, _reference>& y);
+      template <typename _node, typename __pointer, typename __reference>
+      friend bool operator==(const map_iterator<_node, __pointer, __reference>& x,
+      const map_iterator<_node, __pointer, __reference>& y);
   };
 
-  template <typename _node, typename _pointer, typename _reference>
-  bool operator==(const map_iterator<_node, _pointer, _reference>& x,
-  const map_iterator<_node, _pointer, _reference>& y) {
+  template <typename _node, typename __pointer, typename __reference>
+  bool operator==(const map_iterator<_node, __pointer, __reference>& x,
+  const map_iterator<_node, __pointer, __reference>& y) {
     return x._node == y._node;
   }
 
@@ -484,14 +499,48 @@ namespace ft {
         else
           return const_iterator(x, _end_node);
       }
-
+    
     protected:
       key_compare _cmp;
       node         *_root;
       node         *_end_node;
       size_type    _size;
   };
+
+  template <typename _Key, typename _T, typename _Compare>
+  bool operator==(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+    if (lhs.size() == rhs.size()) {
+      return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    } else {
+      return false;
+    }
+  }
+
+  template <typename _Key, typename _T, typename _Compare>
+  bool operator!=(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+    return !(lhs == rhs);
+  }
+
+  template <typename _Key, typename _T, typename _Compare>
+  bool operator<(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+  }
+
+  template <typename _Key, typename _T, typename _Compare>
+  bool operator<=(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+    return (lhs < rhs) || (lhs == rhs);
+  }
   
+  template <typename _Key, typename _T, typename _Compare>
+  bool operator>(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+    return !((lhs < rhs) && (lhs == rhs));
+  }
+  
+  template <typename _Key, typename _T, typename _Compare>
+  bool operator>=(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+    return !(lhs < rhs);
+  }
+
 }
 
 

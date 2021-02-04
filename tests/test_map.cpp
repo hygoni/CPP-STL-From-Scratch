@@ -26,7 +26,7 @@ namespace map_test {
 
     /* copy constructor */
     ft::map<int, int> map3(map2);
-    //assert(map2 == map3);
+    assert(map2 == map3);
   }
 
   void test_insert_erase() {
