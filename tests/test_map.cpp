@@ -74,6 +74,16 @@ namespace map_test {
     assert(map.equal_range(10).second == map.upper_bound(10));
   }
 
+  void test_key_value_comp() {
+    ft::map<int, int> map;
+    ft::map<int, int>::value_compare value_comp = map.value_comp();
+    ft::map<int, int>::key_compare key_comp = map.key_comp();
+
+    assert(key_comp(1, 10));
+    assert(!key_comp(10, 1));
+    assert(value_comp(std::make_pair<const int, int>(10, 10), std::make_pair<const int, int>(100, 100)));
+  }
+
 } // namespace map_test
 
 void test_map() {
@@ -81,4 +91,5 @@ void test_map() {
   map_test::test_iterator();
   map_test::test_insert_erase();
   map_test::test_equal_lower_upper();
+  map_test::test_key_value_comp();
 }

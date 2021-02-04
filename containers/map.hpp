@@ -366,6 +366,24 @@ namespace ft {
       typedef map_iterator<node, pointer, reference> iterator;
       typedef map_iterator<node, const_pointer, const_reference> const_iterator;
 
+      class value_compare {
+        protected:
+          Compare _cmp;
+
+        public:
+          typedef bool result_type;
+          typedef value_type first_argument_type;
+          typedef value_type second_argument_type;
+
+          value_compare(Compare c) {
+            _cmp = c;
+          }
+
+          result_type operator()(value_type x, value_type y) {
+            return _cmp(x.first, y.first);
+          }
+      };
+
       map() {
         _size = 0;
         _root = NULL;
@@ -377,6 +395,7 @@ namespace ft {
         _size = 0;
         _root = NULL;
         _end_node = new node();
+        _cmp = comp;
         insert(first, last);
       }
 
@@ -563,6 +582,14 @@ namespace ft {
           it++;
         }
         return it;
+      }
+
+      key_compare key_comp() const {
+        return _cmp;
+      }
+
+      value_compare value_comp() const {
+        return value_compare(_cmp);
       }
     
     protected:
