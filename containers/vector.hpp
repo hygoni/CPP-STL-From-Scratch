@@ -20,6 +20,8 @@ namespace ft {
       friend class vector;
       template <typename _T>
       friend class ReverseVectorIterator;
+      template <typename _T>
+      friend class VectorIterator;
 
     public:
       typedef T value_type;
@@ -33,9 +35,9 @@ namespace ft {
         _ptr = NULL;
         _idx = 0;
       }
-
-      VectorIterator(VectorIterator const& it) {
-        _ptr = it._ptr;
+      template <typename _T>
+      VectorIterator(VectorIterator<_T> const& it) {
+        _ptr = (T**)it._ptr;
         _idx = it._idx;
       }
 
@@ -116,6 +118,8 @@ namespace ft {
       template <typename _T>
       friend class vector;
 
+      template <typename _T>
+      friend class ReverseVectorIterator;
     public:
       typedef T value_type;
       typedef T* pointer;
@@ -129,8 +133,15 @@ namespace ft {
         _idx = 0;
       }
 
-      ReverseVectorIterator(VectorIterator<T> const& it) {
-        _ptr = it._ptr;
+      template <typename _T>
+      ReverseVectorIterator(VectorIterator<_T> const& it) {
+        _ptr = (T**)it._ptr;
+        _idx = it._idx;
+      }
+
+      template <typename _T>
+      ReverseVectorIterator(ReverseVectorIterator<_T> const& it) {
+        _ptr = (T**)it._ptr;
         _idx = it._idx;
       }
 

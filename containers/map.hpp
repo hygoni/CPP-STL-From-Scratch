@@ -265,6 +265,8 @@ namespace ft {
       template <typename _node_pointer, typename __pointer, typename __reference>
       friend class reverse_map_iterator;
 
+      template <typename _node_pointer, typename __pointer, typename __reference>
+      friend class map_iterator;
     public:
       typedef ft::bidirectional_iterator_tag iterator_category;
       typedef typename node::value_type value_type;
@@ -281,7 +283,8 @@ namespace ft {
         _node = NULL;
       }
 
-      map_iterator(map_iterator const& it) {
+      template <typename ptr, typename ref>
+      map_iterator(map_iterator<node, ptr, ref> const& it) {
         _node = it._node;
         _end_node = it._end_node;
       }
@@ -370,7 +373,14 @@ namespace ft {
         _node = NULL;
       }
 
-      reverse_map_iterator(map_iterator<node, _pointer, _reference> const& it) {
+      template <typename ptr, typename ref>
+      reverse_map_iterator(map_iterator<node, ptr, ref> const& it) {
+        _node = it._node;
+        _end_node = it._end_node;
+      }
+
+      template <typename ptr, typename ref>
+      reverse_map_iterator(reverse_map_iterator<node, ptr, ref> const& it) {
         _node = it._node;
         _end_node = it._end_node;
       }
@@ -530,11 +540,11 @@ namespace ft {
       }
 
       reverse_iterator rbegin() {
-        return reverse_iterator(--end());
+        return ++reverse_iterator(_end_node, _end_node);
       }
 
       const_reverse_iterator rbegin() const {
-        return const_reverse_iterator(--end());
+        return ++const_reverse_iterator(_end_node, _end_node);
       }
 
       iterator end() {
@@ -546,11 +556,11 @@ namespace ft {
       }
 
       reverse_iterator rend() {
-        return reverse_iterator(end());
+        return reverse_iterator(_end_node, _end_node);
       }
 
       const_reverse_iterator rend() const {
-        return const_reverse_iterator(end());
+        return const_reverse_iterator(_end_node, _end_node);
       }
 
       bool empty() const {
