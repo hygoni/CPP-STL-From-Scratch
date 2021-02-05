@@ -6,9 +6,9 @@
 
 namespace list_test {
   template <typename T>
-  bool assert_equal(ft::list<T> left, std::list<T> right) {
-    typename ft::list<T>::iterator it;
-    typename std::list<T>::iterator it2;
+  bool assert_equal(const ft::list<T>& left, const std::list<T>& right) {
+    typename ft::list<T>::const_iterator it;
+    typename std::list<T>::const_iterator it2;
     
     assert(left.size() == right.size());
     it = left.begin();

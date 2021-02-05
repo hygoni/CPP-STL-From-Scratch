@@ -16,8 +16,8 @@ namespace map_test {
     }
 
     ft::map<int, int> map2(vector.begin(), vector.end());
-    ft::vector<std::pair<int, int> >::iterator it = vector.begin();
-    ft::map<int, int>::iterator it2 = map2.begin();
+    ft::vector<std::pair<int, int> >::const_iterator it = vector.begin();
+    ft::map<int, int>::const_iterator it2 = map2.begin();
     while (it != vector.end()) {
       assert(it->first == it2->first && it->second == it2->second);
       it++;

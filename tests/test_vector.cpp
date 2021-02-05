@@ -6,9 +6,9 @@
 
 namespace vector_test {
   template <typename T>
-  bool assert_equal(ft::vector<T> left, std::vector<T> right) {
-    typename ft::vector<T>::iterator it;
-    typename std::vector<T>::iterator it2;
+  bool assert_equal(const ft::vector<T>& left, const std::vector<T>& right) {
+    typename ft::vector<T>::const_iterator it;
+    typename std::vector<T>::const_iterator it2;
     
     assert(left.size() == right.size());
     it = left.begin();
@@ -90,8 +90,8 @@ namespace vector_test {
       v.push_back(i);
     }
 
-    ft::vector<int>::iterator it = v.begin();
-    ft::vector<int>::reverse_iterator rit = v.rbegin();
+    ft::vector<int>::const_iterator it = v.begin();
+    ft::vector<int>::const_reverse_iterator rit = v.rbegin();
 
     for (int i = 0 ; i < 100000; i++) {
       assert(v[i] == i && *it == i);
