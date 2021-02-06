@@ -41,6 +41,12 @@ namespace map_test {
     assert(map.count(10) == 1);
     assert(map.count(100) == 0); 
     assert(map.size() == 1);
+    
+    map.erase(map.begin());
+    assert(map.insert(std::make_pair<int, int>(1000, 1000)).second == true);
+    assert(map.insert(std::make_pair<int, int>(1000, 1000)).second == false);
+    assert(map.insert(std::make_pair<int, int>(1000, 1000)).first->first == 1000);
+    
   }
   
   void test_iterator() {

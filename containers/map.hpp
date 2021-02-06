@@ -178,12 +178,12 @@ namespace ft {
         }
       }
 
-      static node* erase(node *x, const key_type& key) {
+      static node* erase(node *x, const key_type& key, const key_compare& cmp) {
         if (x == NULL)
           return x;
-        if (_cmp(key, x->get_key())) {
-          x->_left = erase(x->_left, key);
-        } else if (!_cmp(key, x->get_key()) && !_cmp(x->get_key(), key)) {
+        if (cmp(key, x->get_key())) {
+          x->_left = erase(x->_left, key, cmp);
+        } else if (!cmp(key, x->get_key()) && !cmp(x->get_key(), key)) {
           /* found node */
 
           if (x->_left == NULL || x->_right == NULL) {
@@ -194,17 +194,19 @@ namespace ft {
               x = NULL;
             } else {
               /* has one child */
-              x->_value = child->_value; 
+              *const_cast<int*>(&x->_value.first) = child->_value.first; 
+              x->_value.second = child->_value.second;
             }
             delete child;
           } else {
             /* has two child */
             node *next = min_node(x->_right); /* inorder successor */
-            x->_value = next->_value;
-            x->_right = erase(x->_right, next->get_key());
+            *const_cast<int*>(&x->_value.first) = next->_value.first; 
+            x->_value.second = next->_value.second;
+            x->_right = erase(x->_right, next->get_key(), cmp);
           }
         } else {
-          x->_right = erase(x->_right, key);
+          x->_right = erase(x->_right, key, cmp);
         }
         if (x == NULL)
           return x;
@@ -619,7 +621,7 @@ namespace ft {
       }
 
       void erase(iterator pos) {
-        _root = node::erase(_root, pos->get_key());
+        _root = node::erase(_root, pos->first, _cmp);
       }
 
       void erase(iterator first, iterator last) {
