@@ -5,6 +5,13 @@ namespace ft {
 
   template <class>
   struct enable_if { typedef void type; };
+  
+  template <typename _type>
+  struct remove_const { typedef _type type; };
+
+  template <typename _type>
+  struct remove_const<const _type> { typedef _type type; };
+  
   class iterator_category {};
   class input_iterator_tag {};
   class output_iterator_tag {};
@@ -43,11 +50,11 @@ namespace ft {
       pair(const pair& other) : first(other.first), second(other.second) {}
       
       template <typename _K, typename _V>
-      pair(const pair<_K, _V> other) : first(other.first), second(other.second) {}
+      pair(const pair<_K, _V>& other) : first(other.first), second(other.second) {}
 
       pair& operator=(const pair& other) {
-        first = other.first;
-        second = other.second;
+        *const_cast<typename ft::remove_const<K>::type*>(&first) = other.first;
+        *const_cast<typename ft::remove_const<V>::type*>(&second) = other.second;
         return *this;
       }
 

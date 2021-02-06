@@ -175,7 +175,6 @@ namespace ft {
           x->_left = erase(x->_left, key, cmp);
         } else if (!cmp(key, x->get_key()) && !cmp(x->get_key(), key)) {
           /* found node */
-
           if (x->_left == NULL || x->_right == NULL) {
             node *child = x->_left ? x->_left : x->_right;
             /* has no child */
@@ -186,8 +185,7 @@ namespace ft {
               /* has one child */
               x->_left = child->_left;
               x->_right = child->_right;
-              *const_cast<int*>(&x->_value.first) = child->_value.first; 
-              x->_value.second = child->_value.second;
+              x->_value = child->_value;
             }
             /* prevent use-after-free */
             child->_left = child->_right = NULL;
@@ -195,8 +193,7 @@ namespace ft {
           } else {
             /* has two child */
             node *next = min_node(x->_right); /* inorder successor */
-            *const_cast<int*>(&x->_value.first) = next->_value.first; 
-            x->_value.second = next->_value.second;
+            x->_value = next->_value;
             x->_right = erase(x->_right, next->get_key(), cmp);
           }
         } else {
