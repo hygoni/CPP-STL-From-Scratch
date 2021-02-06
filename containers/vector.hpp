@@ -469,7 +469,7 @@ namespace ft {
   template <typename T>
   bool operator==(const vector<T>& lhs, const vector<T>& rhs) {
     if (lhs.size() == rhs.size()) {
-      return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+      return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
     } else {
       return false;
     }
@@ -477,7 +477,7 @@ namespace ft {
 
   template <typename T>
   bool operator<(vector<T> lhs, vector<T> rhs) {
-    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
   }
 
   template <typename T>

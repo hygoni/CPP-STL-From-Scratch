@@ -651,7 +651,7 @@ namespace ft {
   template <typename T>
   bool operator==(const list<T>& lhs, const list<T>& rhs) {
     if (lhs.size() == rhs.size()) {
-      return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+      return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
     } else {
       return false;
     }
@@ -659,7 +659,7 @@ namespace ft {
 
   template <typename T>
   bool operator<(list<T> lhs, list<T> rhs) {
-    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
   }
 
   template <typename T>

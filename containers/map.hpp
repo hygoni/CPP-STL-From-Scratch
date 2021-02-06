@@ -736,7 +736,7 @@ namespace ft {
   template <typename _Key, typename _T, typename _Compare>
   bool operator==(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
     if (lhs.size() == rhs.size()) {
-      return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+      return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
     } else {
       return false;
     }
@@ -749,7 +749,7 @@ namespace ft {
 
   template <typename _Key, typename _T, typename _Compare>
   bool operator<(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
-    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
   }
 
   template <typename _Key, typename _T, typename _Compare>
