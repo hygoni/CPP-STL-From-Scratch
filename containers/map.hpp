@@ -650,6 +650,8 @@ namespace ft {
       void swap(map& other) {
         std::swap(_size, other._size);
         std::swap(_root, other._root);
+        std::swap(_end_node, other._end_node);
+        std::swap(_cmp, other._cmp);
       }
 
       size_type count(const key_type& key) {
@@ -794,7 +796,7 @@ namespace ft {
   }
 
   template <typename _Key, typename _T, typename _Compare>
-  void swap(const map<_Key, _T, _Compare>& lhs, const map<_Key, _T, _Compare>& rhs) {
+  void swap(map<_Key, _T, _Compare>& lhs, map<_Key, _T, _Compare>& rhs) {
     lhs.swap(rhs);
   }
 

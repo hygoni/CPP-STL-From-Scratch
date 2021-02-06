@@ -517,6 +517,11 @@ namespace ft {
   bool operator!=(vector<T> lhs, vector<T> rhs) {
     return !(lhs == rhs);
   }
+
+  template <typename T>
+  void swap(vector<T>& lhs, vector<T>& rhs) {
+    lhs.swap(rhs);
+  }
 }  // namespace ft
 
 #endif  // VECTOR_HPP_

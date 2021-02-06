@@ -135,6 +135,19 @@ namespace map_test {
     assert(value_comp(std::make_pair<const int, int>(10, 10), std::make_pair<const int, int>(100, 100)));
   }
 
+  void test_swap() {
+    ft::map<int, int> map;
+    ft::map<int, int> map2;
+
+    for (int i = 1; i <= 100; i++) {
+      map[i] = i;
+    }
+    map.swap(map2);
+    assert(map != map2 && map2.size() == 100 && map.size() == 0);
+    ft::swap(map, map2);
+    assert(map != map2 && map2.size() == 0 && map.size() == 100);
+  }
+
 } // namespace map_test
 
 void test_map() {
@@ -143,4 +156,5 @@ void test_map() {
   map_test::test_insert_erase();
   map_test::test_equal_lower_upper();
   map_test::test_key_value_comp();
+  map_test::test_swap();
 }
