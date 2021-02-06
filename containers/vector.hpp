@@ -264,6 +264,18 @@ namespace ft {
         return *this;
       }
 
+      void assign(size_type count, const T& value) {
+        clear();
+        while (count--)
+          push_back(value);
+      }
+
+      template <class InputIterator, typename ft::enable_if<typename InputIterator::value_type>::type*>
+      void assign(InputIterator first, InputIterator last) {
+        clear();
+        insert(first, last);
+      }
+
       virtual ~vector() {
         delete[] _array;
       }
@@ -354,7 +366,7 @@ namespace ft {
         return _length;
       }
 
-      size_type max_length() const {
+      size_type max_size() const {
         return std::numeric_limits<difference_type>::max();
       }
 
