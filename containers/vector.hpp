@@ -11,19 +11,9 @@
 namespace ft {
 
   template<typename T>
-  class VectorIterator {
-    protected:
+  struct VectorIterator {
       T**         _ptr;
       int         _idx;
-
-      template <typename _T>
-      friend class vector;
-      template <typename _T>
-      friend class ReverseVectorIterator;
-      template <typename _T>
-      friend class VectorIterator;
-
-    public:
       typedef T value_type;
       typedef T* pointer;
       typedef T& reference;
@@ -110,17 +100,9 @@ namespace ft {
   }
 
   template<typename T>
-  class ReverseVectorIterator {
-    protected:
+  struct ReverseVectorIterator {
       T**         _ptr;
       int         _idx;
-
-      template <typename _T>
-      friend class vector;
-
-      template <typename _T>
-      friend class ReverseVectorIterator;
-    public:
       typedef T value_type;
       typedef T* pointer;
       typedef T& reference;

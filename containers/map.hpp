@@ -11,35 +11,25 @@
 namespace ft {
 
   template <class Key, class T, class Compare = std::less<Key> >
-  class tree_node {
-    public:
-    typedef tree_node<Key, T, Compare> node;
-    typedef Key key_type;
-    typedef T mapped_type;
-    typedef std::pair<const Key, T> value_type;
-    typedef Compare key_compare;
-    typedef size_t size_type;
-    typedef std::ptrdiff_t difference_type;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
-    typedef value_type* pointer;
-    typedef const value_type* const_pointer;
+  struct tree_node {
+      typedef tree_node<Key, T, Compare> node;
+      typedef Key key_type;
+      typedef T mapped_type;
+      typedef std::pair<const Key, T> value_type;
+      typedef Compare key_compare;
+      typedef size_t size_type;
+      typedef std::ptrdiff_t difference_type;
+      typedef value_type& reference;
+      typedef const value_type& const_reference;
+      typedef value_type* pointer;
+      typedef const value_type* const_pointer;
     
-    protected:
       tree_node     *_parent;
       tree_node     *_left;
       tree_node     *_right;
       int            _height;
       value_type     _value;
 
-      template <typename _Key, typename _T, typename _Compare>
-      friend class map;
-      template <typename node, typename pointer, typename reference>
-      friend class map_iterator;
-      template <typename node, typename pointer, typename reference>
-      friend class reverse_map_iterator;
-
-    public:
       tree_node(const value_type& value) : _value(value) {
         _left = _right = _parent = NULL;
         _height = 1;
@@ -261,20 +251,10 @@ namespace ft {
   };
 
   template<typename node, typename _pointer, typename _reference>
-  class map_iterator {
-    protected:
+  struct map_iterator {
       node *_node;
       node *_end_node;
-      template <typename _Key, typename _T, typename _Compare>
-      friend class map;
-
-      template <typename _node_pointer, typename __pointer, typename __reference>
-      friend class reverse_map_iterator;
-
-      template <typename _node_pointer, typename __pointer, typename __reference>
-      friend class map_iterator;
-    public:
-      typedef ft::bidirectional_iterator_tag iterator_category;
+      typedef typename ft::bidirectional_iterator_tag iterator_category;
       typedef typename node::value_type value_type;
       typedef typename node::key_type key_type;
       typedef typename node::mapped_type mapped_type;
@@ -356,18 +336,10 @@ namespace ft {
   }
 
   template<typename node, typename _pointer, typename _reference>
-  class reverse_map_iterator {
-    protected:
+  struct reverse_map_iterator {
       node *_node;
       node *_end_node;
-      template <typename _Key, typename _T, typename _Compare>
-      friend class map;
-
-      template <typename _node, typename __pointer, typename __reference>
-      friend class reverse_map_iterator;
-
-    public:
-      typedef ft::bidirectional_iterator_tag iterator_category;
+      typedef typename ft::bidirectional_iterator_tag iterator_category;
       typedef typename node::value_type value_type;
       typedef typename node::key_type key_type;
       typedef typename node::mapped_type mapped_type;

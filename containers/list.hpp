@@ -22,19 +22,11 @@
 namespace ft {
 
   template<typename T>
-  class ListNode {
-    private:
+  struct ListNode {
         T         _data;
         ListNode  *_prev;
         ListNode  *_next;
-
-        template <typename _T>
-        friend class list;
-        template <typename _T>
-        friend class ListIterator;
-        template <typename Iter>
-        friend class ReverseListIterator;
-    public:
+      
       ListNode() {
         _prev = _next = NULL;
       }
@@ -53,19 +45,9 @@ namespace ft {
   };
 
   template<typename T>
-  class ListIterator {
-    public:
+  struct ListIterator {
       typedef ListNode<T> Node;
-    
-    protected:
       Node *_node;
-      template <typename _T>
-      friend class list;
-
-      template <typename _T>
-      friend class ReverseListIterator;
-
-    public:
       typedef T value_type;
       typedef T* pointer;
       typedef T& reference;
@@ -141,17 +123,9 @@ namespace ft {
   }
   
   template<typename T>
-  class ReverseListIterator {
-    public:
+  struct ReverseListIterator {
       typedef ListNode<T> Node;
-    
-    protected:
       Node *_node;
-      template <typename _T>
-      friend class list;
-
-      template <typename _T>
-      friend class ReverseListIterator;
 
     public:
       typedef T value_type;
