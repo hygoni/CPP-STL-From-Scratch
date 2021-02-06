@@ -56,7 +56,7 @@ namespace map_test {
       map2[i] = i;
     }
     map.insert(map2.begin(), map2.end());
-    assert(std::equal(map.begin(), map.end(), map2.begin()));
+    assert(map == map2);
 
     ft::map<int, int>::const_iterator it = map.begin();
     ft::map<int, int>::const_iterator it2 = map2.begin();
