@@ -530,20 +530,28 @@ namespace ft {
       }
      
      iterator begin() {
+       if (_size == 0)
+         return end();
         node *leftmost = node::min_node(_root);
         return iterator(leftmost, _end_node);
       }
 
       const_iterator begin() const {
+        if (_size == 0)
+          return end();
         node *leftmost = const_cast<node*>(node::min_node(_root));
         return const_iterator(leftmost, _end_node);
       }
 
       reverse_iterator rbegin() {
+        if (_size == 0)
+          return rend();
         return ++reverse_iterator(_end_node, _end_node);
       }
 
       const_reverse_iterator rbegin() const {
+        if (_size == 0)
+          return rend();
         return ++const_reverse_iterator(_end_node, _end_node);
       }
 

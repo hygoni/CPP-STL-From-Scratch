@@ -150,6 +150,9 @@ namespace ft {
       template <typename _T>
       friend class list;
 
+      template <typename _T>
+      friend class ReverseListIterator;
+
     public:
       typedef T value_type;
       typedef T* pointer;
@@ -162,8 +165,14 @@ namespace ft {
         _node = NULL;
       }
 
-      ReverseListIterator(ListIterator<T> const& it) {
+      template <typename _T>
+      ReverseListIterator(ListIterator<_T> const& it) {
         _node = it._node;
+      }
+
+      template <typename _T>
+      ReverseListIterator(ReverseListIterator<_T> const& it) {
+        _node = (Node*)it._node;
       }
 
       ReverseListIterator(Node *node) {
@@ -305,6 +314,8 @@ namespace ft {
         }
 
         iterator begin() {
+          if (_size == 0)
+            return end();
           return iterator(_head);
         }
 
@@ -315,6 +326,8 @@ namespace ft {
         }
 
         const_iterator begin() const {
+          if (_size == 0)
+            return end();
           typedef ListNode<const value_type> const_node;
           return const_iterator(reinterpret_cast<const_node*>(_head));
         }
@@ -327,15 +340,19 @@ namespace ft {
         }
 
         reverse_iterator rbegin() {
+          if (_size == 0)
+            return rend();
           return reverse_iterator(--end());
         }
 
         const_reverse_iterator rbegin() const {
+          if (_size == 0)
+            return rend();
           return const_reverse_iterator(--end());
         }
 
         reverse_iterator rend() {
-          return const_reverse_iterator(_head->_prev);
+          return const_reverse_iterator((ListNode<const T>*)_head->_prev);
         }
 
         const_reverse_iterator rend() const {

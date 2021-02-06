@@ -325,10 +325,14 @@ namespace ft {
       }
 
       iterator begin() {
+        if (_length == 0)
+          return end();
         return iterator(&_array, 0);
       }
 
       const_iterator begin() const {
+        if (_length == 0)
+          return end();
         return const_iterator((const T**)&_array, 0);
       }
 
@@ -341,10 +345,14 @@ namespace ft {
       }
 
       reverse_iterator rbegin() {
+        if (_length == 0)
+          return rend();
         return reverse_iterator(iterator(&_array, _length - 1));
       }
 
       const_reverse_iterator rbegin() const {
+        if (_length == 0)
+          return rend();
         return const_reverse_iterator(iterator(&_array, _length - 1));
       }
 
@@ -364,7 +372,7 @@ namespace ft {
         return _length;
       }
 
-      size_type max_size() const {
+      size_type max_length() const {
         return std::numeric_limits<difference_type>::max();
       }
 
