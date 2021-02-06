@@ -30,6 +30,80 @@ namespace ft {
     }
     return (first1 == last1) && (first2 != last2);
   }
+
+  template <typename K, typename V>
+  struct pair {
+      K first;
+      V second;
+      
+      pair() : first(), second() {}
+      
+      pair(K x, V y) : first(x), second(y) {}
+      
+      pair(const pair& other) : first(other.first), second(other.second) {}
+      
+      template <typename _K, typename _V>
+      pair(const pair<_K, _V> other) : first(other.first), second(other.second) {}
+
+      pair& operator=(const pair& other) {
+        first = other.first;
+        second = other.second;
+        return *this;
+      }
+
+      template <typename _K, typename _V>
+      friend bool operator==(const pair<_K, _V>& x, const pair<_K, _V>& y);
+      template <typename _K, typename _V>
+      friend bool operator<(const pair<_K, _V>& x, const pair<_K, _V>& y);
+      template <typename _K, typename _V>
+      friend bool operator<=(const pair<_K, _V>& x, const pair<_K, _V>& y);
+      template <typename _K, typename _V>
+      friend bool operator>(const pair<_K, _V>& x, const pair<_K, _V>& y);
+      template <typename _K, typename _V>
+      friend bool operator>=(const pair<_K, _V>& x, const pair<_K, _V>& y);
+      template <typename _K, typename _V>
+      friend bool operator!=(const pair<_K, _V>& x, const pair<_K, _V>& y);
+      
+  };
+
+  template <typename _K, typename _V>
+  bool operator==(const pair<_K, _V>& x, const pair<_K, _V>& y) {
+    return (x.first == y.first) && (x.second == y.second);
+  }
+
+  template <typename _K, typename _V>
+  bool operator<(const pair<_K, _V>& x, const pair<_K, _V>& y) {
+    if (x.first == y.first) {
+      return (x.second < y.second);
+    } else {
+      return (x.first < y.first);
+    }
+  }
+
+  template <typename _K, typename _V>
+  bool operator<=(const pair<_K, _V>& x, const pair<_K, _V>& y) {
+    return (x < y) || (x == y);
+  }
+
+  template <typename _K, typename _V>
+  bool operator>(const pair<_K, _V>& x, const pair<_K, _V>& y) {
+    return (y < x);
+  }
+
+  template <typename _K, typename _V>
+  bool operator>=(const pair<_K, _V>& x, const pair<_K, _V>& y) {
+    return !(x < y);
+  }
+  
+  template <typename _K, typename _V>
+  bool operator!=(const pair<_K, _V>& x, const pair<_K, _V>& y) {
+    return !(x == y);
+  }
+
+  template <typename _K, typename _V>
+  pair<_K, _V> make_pair(_K key, _V value) {
+    return pair<_K, _V>(key, value);
+  }
 }
 
 #endif  // UTIL_HPP_

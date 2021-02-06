@@ -2,6 +2,7 @@
 #include <iostream>
 #include "map.hpp"
 #include "vector.hpp"
+#include "util.hpp"
 
 namespace map_test {
   void test_constructor() {
@@ -10,13 +11,13 @@ namespace map_test {
     assert(map.empty());
 
     /* constructor with iterator */
-    ft::vector<std::pair<int, int> > vector;
+    ft::vector<ft::pair<int, int> > vector;
     for (int i = 0; i < 10000; i++) {
-      vector.push_back(std::make_pair(i, i));
+      vector.push_back(ft::make_pair(i, i));
     }
 
     ft::map<int, int> map2(vector.begin(), vector.end());
-    ft::vector<std::pair<int, int> >::const_iterator it = vector.begin();
+    ft::vector<ft::pair<int, int> >::const_iterator it = vector.begin();
     ft::map<int, int>::const_iterator it2 = map2.begin();
     while (it != vector.end()) {
       assert(it->first == it2->first && it->second == it2->second);
@@ -43,10 +44,10 @@ namespace map_test {
     assert(map.size() == 1);
     
     map.erase(map.begin());
-    assert(map.insert(std::make_pair<int, int>(1000, 1000)).second == true);
-    assert(map.insert(std::make_pair<int, int>(1000, 1000)).second == false);
-    assert(map.insert(std::make_pair<int, int>(1000, 1000)).first->first == 1000);
-    map.insert(map.begin(), std::make_pair<int, int>(1234, 1234));
+    assert(map.insert(ft::make_pair<int, int>(1000, 1000)).second == true);
+    assert(map.insert(ft::make_pair<int, int>(1000, 1000)).second == false);
+    assert(map.insert(ft::make_pair<int, int>(1000, 1000)).first->first == 1000);
+    map.insert(map.begin(), ft::make_pair<int, int>(1234, 1234));
     assert(map.find(1234) != map.end());
     map.clear();
 
@@ -132,7 +133,7 @@ namespace map_test {
 
     assert(key_comp(1, 10));
     assert(!key_comp(10, 1));
-    assert(value_comp(std::make_pair<const int, int>(10, 10), std::make_pair<const int, int>(100, 100)));
+    assert(value_comp(ft::make_pair<const int, int>(10, 10), ft::make_pair<const int, int>(100, 100)));
   }
 
   void test_swap() {

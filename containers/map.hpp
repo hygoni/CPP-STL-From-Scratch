@@ -15,7 +15,7 @@ namespace ft {
       typedef tree_node<Key, T, Compare> node;
       typedef Key key_type;
       typedef T mapped_type;
-      typedef std::pair<const Key, T> value_type;
+      typedef ft::pair<const Key, T> value_type;
       typedef Compare key_compare;
       typedef size_t size_type;
       typedef std::ptrdiff_t difference_type;
@@ -435,7 +435,7 @@ namespace ft {
     public:
       typedef Key key_type;
       typedef T mapped_type;
-      typedef std::pair<const Key, T> value_type;
+      typedef ft::pair<const Key, T> value_type;
       typedef Compare key_compare;
       typedef size_t size_type;
       typedef std::ptrdiff_t difference_type;
@@ -506,7 +506,7 @@ namespace ft {
       }
 
       mapped_type& operator[](key_type key) {
-       insert(std::make_pair<const key_type, mapped_type>(key, mapped_type()));
+       insert(ft::make_pair<const key_type, mapped_type>(key, mapped_type()));
        return node::find(_root, key, _cmp)->get_value();
       }
      
@@ -571,7 +571,7 @@ namespace ft {
         _size = 0;
       }
 
-      std::pair<iterator, bool> insert(const value_type& value) {
+      ft::pair<iterator, bool> insert(const value_type& value) {
         bool is_successful;
         /* logical error */
         node *inserted = node::insert(_root, value, _cmp, &is_successful);
@@ -582,7 +582,7 @@ namespace ft {
           _end_node->_left = node::max_node(_root);
           _end_node->_right = node::min_node(_root);
         }
-        return std::make_pair<iterator, bool>(iterator(inserted, _end_node), is_successful);
+        return ft::make_pair<iterator, bool>(iterator(inserted, _end_node), is_successful);
       }
       
 
@@ -649,20 +649,20 @@ namespace ft {
           return const_iterator(x, _end_node);
       }
 
-      std::pair<iterator, iterator> equal_range(const key_type& key) {
+      ft::pair<iterator, iterator> equal_range(const key_type& key) {
         iterator first, last;
 
         first = lower_bound(key);
         last = upper_bound(key);
-        return std::make_pair(first, last);
+        return ft::make_pair(first, last);
       }
 
-      std::pair<const_iterator, const_iterator> equal_range(const key_type& key) const {
+      ft::pair<const_iterator, const_iterator> equal_range(const key_type& key) const {
         const_iterator first, last;
         
         first = lower_bound(key);
         last = upper_bound(key);
-        return std::make_pair(first, last);
+        return ft::make_pair(first, last);
       }
 
       iterator lower_bound(const key_type& key) {
