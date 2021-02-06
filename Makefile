@@ -1,6 +1,6 @@
 NAME = ft_containers
 CFLAGS = -fsanitize=address --std=c++98 -g -Wall -Wextra -Werror
-SRCS = ${addprefix tests/, ${shell ls tests | grep '\.cpp'}}
+SRCS = ${addprefix my_test/, ${shell ls tests | grep '\.cpp'}}
 OBJS = ${SRCS:.cpp=.o}
 CC = clang++
 RM = rm -f
