@@ -59,8 +59,9 @@ namespace ft {
         _node = NULL;
       }
 
-      ListIterator(ListIterator const& it) {
-        _node = it._node;
+      template <typename _T>
+      ListIterator(ListIterator<_T> const& it) {
+        _node = (Node*)it._node;
       }
 
       ListIterator(Node *node) {
@@ -126,8 +127,6 @@ namespace ft {
   struct ReverseListIterator {
       typedef ListNode<T> Node;
       Node *_node;
-
-    public:
       typedef T value_type;
       typedef T* pointer;
       typedef T& reference;
@@ -246,8 +245,9 @@ namespace ft {
         }
 
 
-        template <class InputIterator, typename ft::enable_if<typename InputIterator::value_type>::type*>
-        list(InputIterator first, InputIterator last) {
+        template <class InputIterator>
+        list(InputIterator first, InputIterator last,
+        typename ft::enable_if<typename InputIterator::iterator_category>::type* = NULL) {
           _size = 0;
           _head = _tail = new Node();
           _head->_prev = NULL;
@@ -403,7 +403,7 @@ namespace ft {
 
         template <class InputIterator>
         void insert(iterator position, InputIterator first, InputIterator last,
-        typename ft::enable_if<typename InputIterator::value_type>::type* = 0) {
+        typename ft::enable_if<typename InputIterator::iterator_category>::type* = NULL) {
           while (first != last) {
             insert(position, *first);
             first++;

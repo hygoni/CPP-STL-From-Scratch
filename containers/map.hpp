@@ -477,7 +477,8 @@ namespace ft {
       }
 
       template <typename InputIterator>
-      map (InputIterator first, InputIterator last, const Compare& comp = Compare()) {
+      map (InputIterator first, InputIterator last, const Compare& comp = Compare(),
+      typename ft::enable_if<typename InputIterator::value_type>::type* = NULL) {
         _size = 0;
         _root = NULL;
         _end_node = new node();
@@ -589,7 +590,8 @@ namespace ft {
       }
 
       template <typename InputIterator>
-      void insert(InputIterator first, InputIterator last) {
+      void insert(InputIterator first, InputIterator last, 
+      typename ft::enable_if<typename InputIterator::value_type>::type* = NULL) {
         while (first != last) {
           insert(*first);
           first++;

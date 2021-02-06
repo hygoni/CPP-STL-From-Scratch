@@ -25,6 +25,7 @@ namespace ft {
         _ptr = NULL;
         _idx = 0;
       }
+
       template <typename _T>
       VectorIterator(VectorIterator<_T> const& it) {
         _ptr = (T**)it._ptr;
@@ -43,39 +44,55 @@ namespace ft {
       }
 
       /* prefix increment */
-      virtual VectorIterator& operator++() {
+      VectorIterator& operator++() {
         _idx++;
         return *this;
       }
 
       /* postfix increment */
-      virtual VectorIterator operator++(int) {
+      VectorIterator operator++(int) {
         VectorIterator current = *this;
         ++(*this);
         return current;
       }
 
-      virtual VectorIterator& operator+(int val) {
-        _idx += val;
+      VectorIterator operator+(int val) {
+        VectorIterator it = *this;
+        it._idx += val;
+        return it;
+      }
+
+      VectorIterator& operator-(int val) {
+        VectorIterator it = *this;
+        it._idx -= val;
         return *this;
       }
 
-      virtual VectorIterator& operator-(int val) {
-        _idx -= val;
-        return *this;
+      difference_type operator-(const VectorIterator& other) {
+        return _idx - other._idx;
       }
       
       /* prefix decrement */
-      virtual VectorIterator& operator--() {
+      VectorIterator& operator--() {
         _idx--;
         return *this;
       }
 
       /* postfix decrement */
-      virtual VectorIterator operator--(int) {
+      VectorIterator operator--(int) {
         VectorIterator current = *this;
         --(*this);
         return current;
+      }
+      
+      VectorIterator& operator-=(int x) {
+        _idx -= x;
+        return *this;
+      }
+
+      VectorIterator& operator+=(int x) {
+        _idx += x;
+        return *this;
       }
 
       reference operator*() {
@@ -92,11 +109,44 @@ namespace ft {
 
       template <typename _T>
       friend bool operator==(const VectorIterator<_T>& x, const VectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator<(const VectorIterator<_T>& x, const VectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator>(const VectorIterator<_T>& x, const VectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator>=(const VectorIterator<_T>& x, const VectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator>=(const VectorIterator<_T>& x, const VectorIterator<_T>& y);
   };
   
   template <typename _T>
   bool operator==(const VectorIterator<_T>& x, const VectorIterator<_T>& y) {
     return (x._ptr == y._ptr) && (x._idx == y._idx);
+  }
+  
+  template <typename _T>
+  bool operator-(const VectorIterator<_T>& x, const VectorIterator<_T>& y) {
+    return (x._idx - y._idx);
+  }
+
+  template <typename _T>
+  bool operator<(const VectorIterator<_T>& x, const VectorIterator<_T>& y) {
+    return (y - x > 0);
+  }
+
+  template <typename _T>
+  bool operator>(const VectorIterator<_T>& x, const VectorIterator<_T>& y) {
+    return (y < x);
+  }
+
+  template <typename _T>
+  bool operator<=(const VectorIterator<_T>& x, const VectorIterator<_T>& y) {
+    return !(x > y);
+  }
+
+  template <typename _T>
+  bool operator>=(const VectorIterator<_T>& x, const VectorIterator<_T>& y) {
+    return !(x < y);
   }
 
   template<typename T>
@@ -116,13 +166,13 @@ namespace ft {
       }
 
       template <typename _T>
-      ReverseVectorIterator(VectorIterator<_T> const& it) {
+      ReverseVectorIterator(ReverseVectorIterator<_T> const& it) {
         _ptr = (T**)it._ptr;
         _idx = it._idx;
       }
 
       template <typename _T>
-      ReverseVectorIterator(ReverseVectorIterator<_T> const& it) {
+      ReverseVectorIterator(VectorIterator<_T> const& it) {
         _ptr = (T**)it._ptr;
         _idx = it._idx;
       }
@@ -140,7 +190,7 @@ namespace ft {
 
       /* prefix increment */
       ReverseVectorIterator& operator++() {
-        _idx--;
+        _idx++;
         return *this;
       }
 
@@ -151,19 +201,25 @@ namespace ft {
         return current;
       }
 
-      ReverseVectorIterator& operator+(int val) {
-        _idx -= val;
-        return *this;
+      ReverseVectorIterator operator+(int val) {
+        ReverseVectorIterator it = *this;
+        it._idx += val;
+        return it;
       }
 
       ReverseVectorIterator& operator-(int val) {
-        _idx += val;
+        ReverseVectorIterator it = *this;
+        it._idx -= val;
         return *this;
+      }
+
+      difference_type operator-(const ReverseVectorIterator& other) {
+        return _idx - other._idx;
       }
       
       /* prefix decrement */
       ReverseVectorIterator& operator--() {
-        _idx++;
+        _idx--;
         return *this;
       }
 
@@ -172,6 +228,16 @@ namespace ft {
         ReverseVectorIterator current = *this;
         --(*this);
         return current;
+      }
+      
+      ReverseVectorIterator& operator-=(int x) {
+        _idx -= x;
+        return *this;
+      }
+
+      ReverseVectorIterator& operator+=(int x) {
+        _idx += x;
+        return *this;
       }
 
       reference operator*() {
@@ -188,11 +254,44 @@ namespace ft {
 
       template <typename _T>
       friend bool operator==(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator<(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator>(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator>=(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y);
+      template <typename _T>
+      friend bool operator>=(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y);
   };
-
+  
   template <typename _T>
   bool operator==(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y) {
     return (x._ptr == y._ptr) && (x._idx == y._idx);
+  }
+  
+  template <typename _T>
+  bool operator-(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y) {
+    return (x._idx - y._idx);
+  }
+
+  template <typename _T>
+  bool operator<(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y) {
+    return (y - x > 0);
+  }
+
+  template <typename _T>
+  bool operator>(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y) {
+    return (y < x);
+  }
+
+  template <typename _T>
+  bool operator<=(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y) {
+    return !(x > y);
+  }
+
+  template <typename _T>
+  bool operator>=(const ReverseVectorIterator<_T>& x, const ReverseVectorIterator<_T>& y) {
+    return !(x < y);
   }
 
   template <typename T>
@@ -234,8 +333,9 @@ namespace ft {
         }
       }
 
-      template <class InputIterator, typename ft::enable_if<typename InputIterator::value_type>::type*>
-      vector(InputIterator first, InputIterator last) : _factor(0.75) {
+      template <class InputIterator> 
+      vector(InputIterator first, InputIterator last,
+      typename ft::enable_if<typename InputIterator::value_type>::type* = NULL) : _factor(0.75) {
         _capacity = DEFAULT_CAPACITY;
         _length = 0;
         _array = new value_type[_capacity];
@@ -270,10 +370,11 @@ namespace ft {
           push_back(value);
       }
 
-      template <class InputIterator, typename ft::enable_if<typename InputIterator::value_type>::type*>
-      void assign(InputIterator first, InputIterator last) {
+      template <class InputIterator> 
+      void assign(InputIterator first, InputIterator last,
+      typename ft::enable_if<typename InputIterator::value_type>::type* = NULL) {
         clear();
-        insert(first, last);
+        insert(begin(), first, last);
       }
 
       virtual ~vector() {
@@ -413,7 +514,7 @@ namespace ft {
       
       template <class InputIterator>
       iterator insert(iterator pos, InputIterator first, InputIterator last,
-      typename ft::enable_if<typename InputIterator::value_type>::type* = 0) {
+      typename ft::enable_if<typename InputIterator::value_type>::type* = NULL) {
         while (first != last) {
           insert(pos, *first);
           first++;
