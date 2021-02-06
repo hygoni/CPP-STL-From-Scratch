@@ -99,7 +99,16 @@ namespace vector_test {
       it++;
       rit++;
     }
+  }
 
+  void test_abstract_types() {
+    ft::vector<ft::vector<int> > v;
+
+    v.resize(100);
+    for (int i = 0; i < 100; i++) {
+      v[i].push_back(i);
+      assert(v[i][0] == i);
+    }
   }
 
 };
@@ -110,4 +119,5 @@ void test_vector() {
   vector_test::test_push_pop_front_back();
   vector_test::test_insert_erase();
   vector_test::test_reserve_iterator();
+  vector_test::test_abstract_types();
 }

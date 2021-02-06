@@ -194,22 +194,41 @@ namespace list_test {
     one.remove_if(unary_predicate);
     assert(one.front() == 1 && one.size() == 1);
   }
+  void test_abstract_types() {
+    ft::list<ft::list<int> > lst;
+    lst.resize(100);
 
+    ft::list<ft::list<int> >::iterator it = lst.begin();
+    int i = 10;
+    for (; it != lst.end(); it++) {
+      (*it).push_back(i);
+      assert((*it).size() == 1);
+    }
+  }
+  
+  void test_reverse_iterator() {
+    ft::list<int> lst;
+
+    for (int i = 1; i <= 5; i++) {
+      lst.push_back(i);
+    }
+
+    ft::list<int>::const_reverse_iterator it = lst.rbegin();
+    for (int i = 5; i <= 1; i--) {
+      assert(*it == i);
+      it++;
+    }
+
+    ft::list<int>::reverse_iterator it2 = lst.rbegin();
+    for (int i = 5; i <= 1; i--) {
+      assert(*it2 == i);
+      it2++;
+    }
+    
+  }
 }
 
-void test_reverse_iterator() {
-  ft::list<int> lst;
 
-  for (int i = 1; i <= 5; i++) {
-    lst.push_back(i);
-  }
-
-  ft::list<int>::reverse_iterator it = lst.rbegin();
-  for (int i = 5; i <= 1; i--) {
-    assert(*it == i);
-    it++;
-  }
-}
 
 void test_list() {
   list_test::test_constructor();
@@ -221,4 +240,6 @@ void test_list() {
   list_test::test_unique();
   list_test::test_reverse();
   list_test::test_remove();
+  list_test::test_abstract_types();
+  list_test::test_reverse_iterator();
 }
