@@ -46,7 +46,16 @@ namespace map_test {
     assert(map.insert(std::make_pair<int, int>(1000, 1000)).second == true);
     assert(map.insert(std::make_pair<int, int>(1000, 1000)).second == false);
     assert(map.insert(std::make_pair<int, int>(1000, 1000)).first->first == 1000);
-    
+    map.insert(map.begin(), std::make_pair<int, int>(1234, 1234));
+    assert(map.find(1234) != map.end());
+    map.clear();
+
+    ft::map<int, int> map2;
+    for (int i = 0; i < 10000; i++) {
+      map2[i] = i;
+    }
+    map.insert(map2.begin(), map2.end());
+    assert(std::equal(map.begin(), map.end(), map2.begin()));
   }
   
   void test_iterator() {

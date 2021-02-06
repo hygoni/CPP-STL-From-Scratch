@@ -609,7 +609,7 @@ namespace ft {
 
       iterator insert(iterator hint, const value_type& value) {
         (void)hint;
-        return insert(value);
+        return insert(value).first;
       }
 
       template <typename InputIterator>
