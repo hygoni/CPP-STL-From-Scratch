@@ -56,6 +56,14 @@ namespace map_test {
     }
     map.insert(map2.begin(), map2.end());
     assert(std::equal(map.begin(), map.end(), map2.begin()));
+
+    ft::map<int, int>::const_iterator it = map.begin();
+    ft::map<int, int>::const_iterator it2 = map2.begin();
+    while (it != map.end()) {
+      assert(*it == *it2);
+      it2++;
+      it++;
+    }
   }
   
   void test_iterator() {
@@ -83,6 +91,15 @@ namespace map_test {
       assert(rit->second == it->second);
       it--;
       rit++;
+    }
+
+    it = --map.end();
+    ft::map<int, int>::const_reverse_iterator crit = map.rbegin();
+    while (rit != map.rend()) {
+      assert(crit->first == it->first);
+      assert(crit->second == it->second);
+      it--;
+      crit++;
     }
   }
 

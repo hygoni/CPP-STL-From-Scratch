@@ -359,6 +359,9 @@ namespace ft {
       template <typename _Key, typename _T, typename _Compare>
       friend class map;
 
+      template <typename _node, typename __pointer, typename __reference>
+      friend class reverse_map_iterator;
+
     public:
       typedef ft::bidirectional_iterator_tag iterator_category;
       typedef typename node::value_type value_type;
