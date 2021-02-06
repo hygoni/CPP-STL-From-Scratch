@@ -190,7 +190,7 @@ namespace ft {
 
       /* prefix increment */
       ReverseVectorIterator& operator++() {
-        _idx++;
+        _idx--;
         return *this;
       }
 
@@ -203,23 +203,23 @@ namespace ft {
 
       ReverseVectorIterator operator+(int val) {
         ReverseVectorIterator it = *this;
-        it._idx += val;
+        it._idx -= val;
         return it;
       }
 
       ReverseVectorIterator& operator-(int val) {
         ReverseVectorIterator it = *this;
-        it._idx -= val;
+        it._idx += val;
         return *this;
       }
 
       difference_type operator-(const ReverseVectorIterator& other) {
-        return _idx - other._idx;
+        return _idx + other._idx;
       }
       
       /* prefix decrement */
       ReverseVectorIterator& operator--() {
-        _idx--;
+        _idx++;
         return *this;
       }
 
@@ -231,12 +231,12 @@ namespace ft {
       }
       
       ReverseVectorIterator& operator-=(int x) {
-        _idx -= x;
+        _idx += x;
         return *this;
       }
 
       ReverseVectorIterator& operator+=(int x) {
-        _idx += x;
+        _idx -= x;
         return *this;
       }
 
