@@ -421,6 +421,7 @@ namespace ft {
         return ret;
       }
 
+      /* TODO: fix */
       iterator erase(iterator first, iterator last) {
         iterator ret = last;
 
@@ -431,8 +432,7 @@ namespace ft {
           last++;
           amount++;
         }
-        _length -= amount;
-
+        
         while (first != last) {
           last--;
           _length--;
