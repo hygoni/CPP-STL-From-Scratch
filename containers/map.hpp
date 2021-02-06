@@ -194,9 +194,13 @@ namespace ft {
               x = NULL;
             } else {
               /* has one child */
+              x->_left = child->_left;
+              x->_right = child->_right;
               *const_cast<int*>(&x->_value.first) = child->_value.first; 
               x->_value.second = child->_value.second;
             }
+            /* prevent use-after-free */
+            child->_left = child->_right = NULL;
             delete child;
           } else {
             /* has two child */
@@ -624,12 +628,22 @@ namespace ft {
       }
 
       void erase(iterator pos) {
-        _root = node::erase(_root, pos->first, _cmp);
+        _erase(pos);
       }
 
       void erase(iterator first, iterator last) {
         while (first != last) {
-          first = erase(first);
+          first = _erase(first);
+        }
+      }
+
+      size_type erase(const key_type& key) {
+        iterator found = find(key);
+        if (found == end())
+          return 0;
+        else {
+          erase(found);
+          return 1;
         }
       }
 
@@ -734,6 +748,15 @@ namespace ft {
       node         *_root;
       node         *_end_node;
       size_type    _size;
+      
+      iterator _erase(iterator pos) {
+        key_type key = pos->first;
+        _root = node::erase(_root, key, _cmp);
+        _end_node->_left = node::max_node(_root);
+        _end_node->_right = node::min_node(_root);
+        _size--;
+        return lower_bound(key);
+      }
   };
 
   template <typename _Key, typename _T, typename _Compare>

@@ -50,8 +50,9 @@ namespace map_test {
     assert(map.find(1234) != map.end());
     map.clear();
 
+    const int size = 10000;
     ft::map<int, int> map2;
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < size; i++) {
       map2[i] = i;
     }
     map.insert(map2.begin(), map2.end());
@@ -64,6 +65,12 @@ namespace map_test {
       it2++;
       it++;
     }
+
+    map.erase(map.find(0));
+    assert(map.find(0) == map.end());
+    assert(map.size() == size - 1);
+    map.erase(map.begin(), map.end());
+    assert(map.size() == 0);
   }
   
   void test_iterator() {
