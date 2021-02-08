@@ -263,7 +263,12 @@ namespace ft {
           _head = _tail = new Node();
           _head->_prev = NULL;
           _head->_next = NULL;
-          *this = other;
+          const_iterator it = other.begin();
+
+          while (it != other.end()) {
+            push_back(*it);
+            it++;
+          }
         }
 
         virtual ~list() {
@@ -460,7 +465,7 @@ namespace ft {
 
           while (it != other.end()) {
             node = it._node;
-            it = erase(it, false);
+            it = other.erase(it, false);
             insert(position, node);
           }
         }
