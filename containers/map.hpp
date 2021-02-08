@@ -170,11 +170,11 @@ namespace ft {
         }
       }
 
-      static node* erase(node *x, const key_type& key, const key_compare& cmp) {
+      static node* erase(node *x, const key_type& key, const key_compare& cmp, bool delete_node) {
         if (x == NULL)
           return x;
         if (cmp(key, x->get_key())) {
-          x->_left = erase(x->_left, key, cmp);
+          x->_left = erase(x->_left, key, cmp, delete_node);
           if (x->_left)
             x->_left->_parent = x;
         } else if (!cmp(key, x->get_key()) && !cmp(x->get_key(), key)) {
@@ -185,29 +185,44 @@ namespace ft {
             if (child == NULL) {
               child = x;
               x = NULL;
+              if (delete_node)
+                delete child;
             } else {
               /* has one child */
-              x->_left = child->_left;
-              if (x->_left)
-                x->_left->_parent = x;
-              x->_right = child->_right;
-              if (x->_right)
-                x->_right->_parent = x;
-              x->_value = child->_value;
+              if (x->_parent && x->_parent->_left == x)
+                x->_parent->_left = child;
+              else if (x->_parent && x->_parent->_right == x)
+                x->_parent->_right = child;
+              child->_parent = x->_parent;
+              /* prevent use-after-free */
+              x->_left = x->_right = NULL;
+              if (delete_node)
+                delete x;
+              x = child;
             }
-            /* prevent use-after-free */
-            child->_left = child->_right = NULL;
-            delete child;
           } else {
             /* has two child */
             node *next = min_node(x->_right); /* inorder successor */
-            x->_value = next->_value;
-            x->_right = erase(x->_right, next->get_key(), cmp);
-            if (x->_right)
-              x->_right->_parent = x;
+            x->_right = node::erase(x->_right, next->get_key(), cmp, false);
+            x->_left->_parent = next;
+            next->_parent = x->_parent;
+            next->_left = x->_left;
+            if (next->_left)
+              next->_left->_parent = next;
+            next->_right = x->_right;
+            if (next->_right)
+              next->_right->_parent = next;
+            if (x->_parent && x->_parent->_right == x)
+              x->_parent->_right = next;
+            else if (x->_parent && x->_parent->_left == x)
+              x->_parent->_left = next;
+            /* prevent double-free */
+            x->_left = x->_right = NULL;
+            delete x;
+            x = next;
           }
         } else {
-          x->_right = erase(x->_right, key, cmp);
+          x->_right = erase(x->_right, key, cmp, delete_node);
           if (x->_right)
             x->_right->_parent = x;
         }
@@ -742,7 +757,7 @@ namespace ft {
       
       iterator _erase(iterator pos) {
         key_type key = pos->first;
-        _root = node::erase(_root, key, _cmp);
+        _root = node::erase(_root, key, _cmp, true);
         _end_node->_left = node::max_node(_root);
         _end_node->_right = node::min_node(_root);
         _size--;
