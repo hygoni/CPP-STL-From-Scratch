@@ -122,11 +122,13 @@ namespace ft {
 
         if (balance > 1 && right_balance < 0) {
           x->_left = left_rotate(x->_left);
+          x->_left->_parent = x;
           return right_rotate(x);
         }
 
         if (balance < -1 && left_balance > 0) {
           x->_right = right_rotate(x->_right);
+          x->_right->_parent = x;
           return left_rotate(x);
         }
         return x;
@@ -173,6 +175,8 @@ namespace ft {
           return x;
         if (cmp(key, x->get_key())) {
           x->_left = erase(x->_left, key, cmp);
+          if (x->_left)
+            x->_left->_parent = x;
         } else if (!cmp(key, x->get_key()) && !cmp(x->get_key(), key)) {
           /* found node */
           if (x->_left == NULL || x->_right == NULL) {
@@ -184,7 +188,11 @@ namespace ft {
             } else {
               /* has one child */
               x->_left = child->_left;
+              if (x->_left)
+                x->_left->_parent = x;
               x->_right = child->_right;
+              if (x->_right)
+                x->_right->_parent = x;
               x->_value = child->_value;
             }
             /* prevent use-after-free */
@@ -195,9 +203,13 @@ namespace ft {
             node *next = min_node(x->_right); /* inorder successor */
             x->_value = next->_value;
             x->_right = erase(x->_right, next->get_key(), cmp);
+            if (x->_right)
+              x->_right->_parent = x;
           }
         } else {
           x->_right = erase(x->_right, key, cmp);
+          if (x->_right)
+            x->_right->_parent = x;
         }
         if (x == NULL)
           return x;
@@ -491,6 +503,12 @@ namespace ft {
         _root = NULL;
         _end_node = new node();
         insert(other.begin(), other.end());
+      }
+
+      map& operator=(const map& other) {
+        clear();
+        insert(other.begin(), other.end());
+        return *this;
       }
 
       ~map() {
