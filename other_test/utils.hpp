@@ -12,6 +12,7 @@
 
 #ifndef UTILS_HPP
 # define UTILS_HPP
+# include <cstdlib>
 # include <string>
 # include <iostream>
 

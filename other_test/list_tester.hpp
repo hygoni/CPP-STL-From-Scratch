@@ -48,18 +48,18 @@ void	list_test()
 	ft::list<for_test> a1;
 	std::list<for_test> b1;
 	color_blue();
-	std::cout << "my : size = " << a1.size() << " max_size = " << a1.max_size() << " back = " <<a1.back().a << " front = " << a1.front().a << std::endl;
+	std::cout << "my : size = " << a1.size() << " max_size = " << a1.max_size() << std::endl;
 	color_red();
-	std::cout << "or : size = " << b1.size() << " max_size = " << b1.max_size() << " back = " << b1.back().a << " front = " << b1.front().a << std::endl;
+	std::cout << "or : size = " << b1.size() << " max_size = " << b1.max_size() << std::endl;
 	color_black();
 	std::cout << "\nfill constructor test\n";
 	for_test temp1 =gen_test();
 	ft::list<for_test> a2(7,temp1);
 	std::list<for_test> b2(7, temp1);
 	color_blue();
-	std::cout << "my : size = " << a1.size() << " max_size = " << a1.max_size() << " back = " <<a1.back().a << " front = " << a1.front().a << std::endl;
+	std::cout << "my : size = " << a1.size() << " max_size = " << a1.max_size() << std::endl;
 	color_red();
-	std::cout << "or : size = " << b1.size() << " max_size = " << b1.max_size() << " back = " << b1.back().a << " front = " << b1.front().a << std::endl;
+	std::cout << "or : size = " << b1.size() << " max_size = " << b1.max_size() << std::endl;
 	color_blue();
 	std::cout << "my\n";
 	for (ft::list<for_test>::iterator it = a2.begin(); it != a2.end(); it++)

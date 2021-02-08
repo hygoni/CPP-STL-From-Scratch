@@ -20,15 +20,15 @@
 #include "queue_tester.hpp"
 #include "list_tester.hpp"
 
-int main()
+void minsoo_tester()
 {
 	std::string a ="0";
 	srand(time(0));
 	while (a != "exit")
 	{
 		system("clear");
-		std::cout << "1 : vector test\n2 : list test\n3 : map test\n4 : stack test\n5 : queue test\n6 : deque test\n7 : multimap test\n8 : set test\n9 : multiset test\n";
-		std::cin >> a;
+		std::cout << "1 : vector test\n2 : list test\n3 : map test\n4 : stack test\n5 : queue test\n";
+    std::cin >> a;
 		if (a == "1")
 			vector_test();
 		else if (a == "2")
